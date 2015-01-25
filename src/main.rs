@@ -1,11 +1,11 @@
 //TODO(remove)
 #![allow(dead_code)]
 
-use std::io::{File, Reader};
+use std::io::{File, BufWriter, Reader};
 use error::Ch8Error;
 
 const RAM_SIZE: usize = 4096;
-const PROGRAM_START: u16 = 0x200;
+const PROGRAM_START: usize = 0x200;
 
 mod error;
 
@@ -29,7 +29,7 @@ impl Vm {
         Vm {
             reg: [0; 16],
             index: 0,
-            pc: PROGRAM_START, 
+            pc: PROGRAM_START as u16,
             sp: 0,
             stack: [0; 256],
             ram: [0; RAM_SIZE],
@@ -44,10 +44,16 @@ impl Vm {
 
     fn load_rom(&mut self, reader: &mut Reader) -> Result<usize, Ch8Error> {
         let rom = try!(reader.read_to_end());
-        if rom.len() > (RAM_SIZE - PROGRAM_START as usize) {
+        if rom.len() > (RAM_SIZE - PROGRAM_START) {
            return Err(Ch8Error::Io("Rom was larger than available RAM", None))
         }
+        let mut ram = BufWriter::new(&mut self.ram[PROGRAM_START..RAM_SIZE]);
+        try!(ram.write(rom.as_slice()));
         return Ok(rom.len());
+    }
+
+    fn dump_ram(&self, writer: &mut Writer) {
+        writer.write(&self.ram);
     }
 }
 
@@ -85,6 +91,9 @@ fn main() {
         Ok(size) => println!("Loaded rom size: {}", size),
         Err(e) => println!("Error loading rom: {}", e)
     }
+
+    let mut dump_file = File::create(&Path::new("/Users/jakerr/tmp/dump.ch8ram")).unwrap();
+    vm.dump_ram(&mut dump_file);
 
     let op = Op{raw: 0x8cd1};
     println!("addr: 0x{:X}", op.addr());

@@ -1,47 +1,13 @@
 //TODO(remove)
 #![allow(dead_code)]
 
-use std::fmt; 
-use std::io;
-use std::io::{File, IoError};
-use std::error::{Error, FromError};
+use std::io::{File, Reader};
+use error::Ch8Error;
 
 const RAM_SIZE: usize = 4096;
 const PROGRAM_START: u16 = 0x200;
 
-enum Ch8Error {
-    Io(&'static str, Option<IoError>),
-}
-
-impl fmt::Display for Ch8Error {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        return write!(fmt, "{}", self.description())
-    }
-}
-
-impl Error for Ch8Error {
-    fn description(&self) -> &str {
-        use Ch8Error::*;
-        match *self {
-            Io(desc, _) => desc
-        }
-    }
-
-    //fn cause<'a> (&'a self) -> Option<&'a Error> {
-    fn cause(&self) -> Option<&Error> {
-        use Ch8Error::*;
-        match *self {
-            Io(_, Some(ref cause)) => Some(cause),
-            _ => None
-        }
-    }
-}
-
-impl FromError<IoError> for Ch8Error {
-    fn from_error(err: IoError) -> Ch8Error {
-        Ch8Error::Io("Internal IO error: ", Some(err))
-    }
-}
+mod error;
 
 struct Vm {
     reg: [u8; 16],
@@ -76,7 +42,7 @@ impl Vm {
         }
     }
 
-    fn load_rom(&mut self, reader: &mut io::Reader) -> Result<usize, Ch8Error> {
+    fn load_rom(&mut self, reader: &mut Reader) -> Result<usize, Ch8Error> {
         let rom = try!(reader.read_to_end());
         if rom.len() > (RAM_SIZE - PROGRAM_START as usize) {
            return Err(Ch8Error::Io("Rom was larger than available RAM", None))
@@ -117,7 +83,7 @@ fn main() {
     let mut rom_file = File::open(&Path::new("/Users/jakerr/Downloads/IBM Logo.ch8")).unwrap();
     match vm.load_rom(&mut rom_file) {
         Ok(size) => println!("Loaded rom size: {}", size),
-        Err(Ch8Error::Io(e, _)) => println!("Error loading rom: {:?}", e)
+        Err(e) => println!("Error loading rom: {}", e)
     }
 
     let op = Op{raw: 0x8cd1};

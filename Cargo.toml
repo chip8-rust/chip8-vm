@@ -1,0 +1,5 @@
+[package]
+
+name = "chip8"
+version = "0.0.1"
+authors = ["Jake Kerr <kodafox@gmail.com>"]

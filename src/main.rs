@@ -1,8 +1,12 @@
 //TODO(remove)
 #![allow(dead_code)]
+#![allow(unstable)]
 
+use std::io;
 use std::io::{File, BufWriter, Reader};
+use std::time::duration::Duration;
 use error::Ch8Error;
+
 
 const RAM_SIZE: usize = 4096;
 const PROGRAM_START: usize = 0x200;
@@ -11,10 +15,10 @@ mod error;
 
 struct Vm {
     reg: [u8; 16],
-    index: u16,
-    pc: u16,
-    sp: u8,
-    stack: [u16; 256],
+    i: usize,
+    pc: usize,
+    sp: usize,
+    stack: [usize; 256],
     ram: [u8; RAM_SIZE],
 
     timer: u8,
@@ -28,8 +32,8 @@ impl Vm {
     fn new() -> Vm {
         Vm {
             reg: [0; 16],
-            index: 0,
-            pc: PROGRAM_START as u16,
+            i: 0,
+            pc: PROGRAM_START,
             sp: 0,
             stack: [0; 256],
             ram: [0; RAM_SIZE],
@@ -54,6 +58,110 @@ impl Vm {
 
     fn dump_ram(&self, writer: &mut Writer) {
         writer.write(&self.ram).unwrap();
+    }
+
+    fn exec(&mut self, op: &Op) {
+        use Instruction::*;
+        let ins = Instruction::from_op(op);
+        println!("Executing instruction: 0x{:X} {:?}", self.pc, ins);
+        match ins {
+            Clear => {
+                for b in self.screen.iter_mut() {
+                    *b = 0;
+                }
+            },
+            Return => {
+                self.pc = self.stack[self.sp];
+                self.sp-=1;
+            },
+            Jump(addr) => {
+                self.pc = addr as usize;
+            }
+            Call(addr) => {
+                self.sp+=1;
+                self.stack[self.sp] = self.pc;
+                self.pc = addr as usize;
+            },
+            SkipEqualK(vx, k) => {
+                if self.reg[vx as usize] == k {
+                    self.pc += 2;
+                }
+            },
+            SkipNotEqualK(vx, k) => {
+                if self.reg[vx as usize] != k {
+                    self.pc += 2;
+                }
+            },
+            SkipEqual(vx, vy) => {
+                let x = self.reg[vx as usize];
+                let y = self.reg[vy as usize];
+                if x != y {
+                    self.pc += 2;
+                }
+            },
+            SetK(vx, byte) => {
+                self.reg[vx as usize] = byte;
+            },
+            AddK(vx, byte) => {
+                self.reg[vx as usize] += byte;
+            },
+            Set(vx, vy) => {
+                let y = self.reg[vy as usize];
+                self.reg[vx as usize] = y;
+            },
+            LoadI(addr) => {
+                self.i = addr as usize;
+            },
+            LongJump(addr) => {
+                self.pc = (self.reg[0] as u16 + addr) as usize;
+            },
+            Draw(vx, vy, n) => {
+                let x = self.reg[vx as usize] as usize;
+                let y = self.reg[vy as usize] as usize;
+                let i = self.i as usize;
+                let n = n as usize;
+
+                let sprite = &self.ram[i..i+n];
+
+                for (sy, byte) in sprite.iter().enumerate() {
+                    let dy = (y + sy) % 32;
+                    for sx in range(0, 8) {
+                        let px = (*byte >> (7 - sx)) & 0b00000001;
+                        let dx = (x + sx) % 64;
+                        let idx = dy * 64 + dx;
+                        self.screen[idx] ^= px;
+                    }
+                }
+            },
+            AddToI(vx) => {
+                self.i = self.i + self.reg[vx as usize] as usize;
+            }
+            other => {
+                println!("Instruction not implemented {:?} skipping...", other)
+            }
+        }
+    }
+
+    fn step(&mut self) {
+        let raw = {
+            let codes = &self.ram[self.pc..self.pc+2];
+            ((codes[0] as u16) << 8) | codes[1] as u16
+        };
+        let op = Op{ raw: raw };
+        self.pc += 2;
+        self.exec(&op);
+    }
+
+    fn print_screen(&self) {
+        for row in self.screen.chunks(64) {
+            println!("");
+            for byte in row.iter() {
+                match *byte {
+                    0x0 => print!("░"),
+                    _ => print!("▓")
+                }
+            }
+        }
     }
 }
 
@@ -200,7 +308,9 @@ impl Instruction {
 fn main() {
     let mut vm = Vm::new();
 
-    let mut rom_file = File::open(&Path::new("/Users/jakerr/Downloads/IBM Logo.ch8")).unwrap();
+    //let mut rom_file = File::open(&Path::new("/Users/jakerr/Downloads/IBM Logo.ch8")).unwrap();
+    //let mut rom_file = File::open(&Path::new("/Users/jakerr/Downloads/Chip8 Picture.ch8")).unwrap();
+    let mut rom_file = File::open(&Path::new("/Users/jakerr/Downloads/Fishie [Hap, 2005].ch8")).unwrap();
     match vm.load_rom(&mut rom_file) {
         Ok(size) => println!("Loaded rom size: {}", size),
         Err(e) => println!("Error loading rom: {}", e)
@@ -208,6 +318,12 @@ fn main() {
 
     let mut dump_file = File::create(&Path::new("/Users/jakerr/tmp/dump.ch8ram")).unwrap();
     vm.dump_ram(&mut dump_file);
+
+    for i in range(0, 200) {
+        vm.step();
+        vm.print_screen();
+        io::timer::sleep(Duration::milliseconds(300));
+    }
 
     for i in vm.ram.chunks(2) {
         match i {

@@ -95,10 +95,19 @@ fn main() {
     let mut dump_file = File::create(&Path::new("/Users/jakerr/tmp/dump.ch8ram")).unwrap();
     vm.dump_ram(&mut dump_file);
 
-    let op = Op{raw: 0x8cd1};
-    println!("addr: 0x{:X}", op.addr());
-    println!("x: 0x{:X}", op.x());
-    println!("y: 0x{:X}", op.y());
-    println!("n: 0x{:X}", op.n());
-    println!("kk: 0x{:X}", op.kk());
+    for i in vm.ram.chunks(2) {
+        match i {
+            [0, 0] => continue,
+            [h, l] => {
+                let op = Op{raw:((h as u16) << 8) | l as u16};
+                println!("raw: 0x{:X}", op.raw);
+                println!("addr: 0x{:X}", op.addr());
+                println!("x: 0x{:X}", op.x());
+                println!("y: 0x{:X}", op.y());
+                println!("n: 0x{:X}", op.n());
+                println!("kk: 0x{:X}\n", op.kk());
+            },
+            _ => continue
+        }
+    }
 }

@@ -79,11 +79,11 @@ impl Op {
     }
 
     fn n_low(&self) -> Nibble {
-        ((self.raw & 0xF000) >> 12) as u8
+        (self.raw & 0x000F) as u8
     }
 
 
-    fn kk(&self) -> Byte {
+    fn k(&self) -> Byte {
         (self.raw & 0x00FF) as u8
     }
 }
@@ -139,7 +139,7 @@ impl Instruction {
         use Instruction::*;
         match op.n_high() {
             0x0 => {
-                match op.kk() {
+                match op.k() {
                     0xE0 => Clear,
                     0xEE => Return,
                     _ => Sys(op.addr())
@@ -147,8 +147,51 @@ impl Instruction {
             },
             0x1 => Jump(op.addr()),
             0x2 => Call(op.addr()),
-            0x3 => SkipEqualK(op.x(), op.kk()),
-            0x4 => SkipNotEqualK(op.x(), op.kk()),
+            0x3 => SkipEqualK(op.x(), op.k()),
+            0x4 => SkipNotEqualK(op.x(), op.k()),
+            0x5 => SkipEqual(op.x(), op.y()),
+            0x6 => SetK(op.x(), op.k()),
+            0x7 => AddK(op.x(), op.k()),
+            0x8 => {
+                match op.n_low() {
+                    0x0 => Set(op.x(), op.y()),
+                    0x1 => Or(op.x(), op.y()),
+                    0x2 => And(op.x(), op.y()),
+                    0x3 => XOr(op.x(), op.y()),
+                    0x4 => Add(op.x(), op.y()),
+                    0x5 => Sub(op.x(), op.y()),
+                    0x6 => ShiftRight(op.x(), op.y()),
+                    0x7 => SubInv(op.x(), op.y()),
+                    0xE => ShiftLeft(op.x(), op.y()),
+                    _ => Unknown
+                }
+            },
+            0x9 => SkipNotEqual(op.x(), op.y()),
+            0xA => LoadI(op.addr()),
+            0xB => LongJump(op.addr()),
+            0xC => Rand(op.x(), op.k()),
+            0xD => Draw(op.x(), op.y(), op.n_low()),
+            0xE => {
+                match op.k() {
+                    0x9E => SkipPressed(op.x()),
+                    0xA1 => SkipNotPressed(op.x()),
+                    _ => Unknown,
+                }
+            },
+            0xF => {
+                match op.k() {
+                    0x07 => GetTimer(op.x()),
+                    0x0A => WaitKey(op.x()),
+                    0x15 => SetTimer(op.x()),
+                    0x18 => SetTone(op.x()),
+                    0x1E => AddToI(op.x()),
+                    0x29 => LoadHexGlyph(op.x()),
+                    0x33 => StoreBCD(op.x()),
+                    0x55 => StoreRegisters(op.x()),
+                    0x65 => LoadRegisters(op.x()),
+                    _ => Unknown,
+                }
+            }
             _ => Unknown
         }
     }
@@ -178,7 +221,7 @@ fn main() {
                 println!("y: 0x{:X}", op.y());
                 println!("n_high: 0x{:X}", op.n_high());
                 println!("n_low: 0x{:X}", op.n_low());
-                println!("kk: 0x{:X}\n", op.kk());
+                println!("k: 0x{:X}\n", op.k());
             },
             _ => continue
         }

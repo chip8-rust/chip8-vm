@@ -102,8 +102,50 @@ impl Vm {
             Or(vx, vy)  => self.reg[vx as usize] |= self.reg[vy as usize],
             And(vx, vy) => self.reg[vx as usize] &= self.reg[vy as usize],
             XOr(vx, vy) => self.reg[vx as usize] ^= self.reg[vy as usize],
-            Add(vx, vy) => self.reg[vx as usize] += self.reg[vy as usize],
-            Sub(vx, vy) => self.reg[vx as usize] -= self.reg[vy as usize],
+            Add(vx, vy) => {
+                let x = self.reg[vx as usize] as u16;
+                let y = self.reg[vy as usize] as u16;
+                let res = x + y;
+
+                // VF is carryover
+                self.reg[15] = (res > 255) as u8;
+
+                self.reg[vx as usize] = res as u8;
+            },
+            Sub(vx, vy) => {
+                let x = self.reg[vx as usize];
+                let y = self.reg[vy as usize];
+
+                // VF is Not Borrow i.e. x > y
+                self.reg[15] = (x > y) as u8;
+
+                self.reg[vx as usize] = x - y;
+            },
+            ShiftRight(vx, vy) => {
+                let y = self.reg[vy as usize];
+
+                // VF is lsb before shift
+                self.reg[15] = 0x1 & y;
+
+                self.reg[vx as usize] = y >> 1;
+            },
+            SubInv(vx, vy) => {
+                let x = self.reg[vx as usize];
+                let y = self.reg[vy as usize];
+
+                // VF is Not Borrow i.e. y > x
+                self.reg[15] = (y > x) as u8;
+
+                self.reg[vx as usize] = y - x;
+            },
+            ShiftLeft(vx, vy) => {
+                let y = self.reg[vy as usize];
+
+                // VF is msb before shift
+                self.reg[15] =  0x80 & y;
+
+                self.reg[vx as usize] = y << 1;
+            }
             SkipNotEqual(vx, vy) => {
                 let x = self.reg[vx as usize];
                 let y = self.reg[vy as usize];
@@ -125,6 +167,7 @@ impl Vm {
 
                 let sprite = &self.ram[i..i+n];
 
+                self.reg[15] = 0;
                 for (sy, byte) in sprite.iter().enumerate() {
                     let dy = (y + sy) % 32;
                     for sx in range(0, 8) {
@@ -132,9 +175,9 @@ impl Vm {
                         let dx = (x + sx) % 64;
                         let idx = dy * 64 + dx;
                         self.screen[idx] ^= px;
-                        if self.screen[idx] == 0 && px == 1 {
-                            self.reg[15] = 1;
-                        }
+
+                        // Vf is if there was a collision
+                        self.reg[15] |= (self.screen[idx] == 0 && px == 1) as u8;
                     }
                 }
             },
@@ -176,7 +219,6 @@ impl Vm {
         let op = Op::new(raw);
         self.pc += 2;
         let idle = self.exec(&op);
-        self.reg[15] = 0;
         return idle;
     }
 

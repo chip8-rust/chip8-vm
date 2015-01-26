@@ -22,7 +22,7 @@ fn main() {
         "zerod.ch8",              // 3
         "sierp.ch8",              // 4
     ];
-    let rom_path = Path::new(format!("/Users/jakerr/Downloads/{}", roms[2]));
+    let rom_path = Path::new(format!("/Users/jakerr/Downloads/{}", roms[4]));
 
     let mut rom_file = File::open(&rom_path).unwrap();
 

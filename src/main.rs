@@ -21,8 +21,9 @@ fn main() {
         "Fishie [Hap, 2005].ch8", // 2
         "zerod.ch8",              // 3
         "sierp.ch8",              // 4
+        "pong.ch8",               // 5
     ];
-    let rom_path = Path::new(format!("/Users/jakerr/Downloads/{}", roms[4]));
+    let rom_path = Path::new(format!("/Users/jakerr/Downloads/{}", roms[5]));
 
     let mut rom_file = File::open(&rom_path).unwrap();
 
@@ -36,8 +37,8 @@ fn main() {
 
     loop {
         if vm.step() { break; }
-        // io::timer::sleep(Duration::milliseconds(80));
-        // vm.print_screen();
+        io::timer::sleep(Duration::milliseconds(80));
+        vm.print_screen();
     }
     io::timer::sleep(Duration::milliseconds(300));
     vm.print_screen();

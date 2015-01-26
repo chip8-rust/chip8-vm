@@ -1,8 +1,12 @@
 use std::io::{BufWriter, Reader};
+use std::num::Float;
 use error::Ch8Error;
 use ops::{Op, Instruction};
+
 const RAM_SIZE: usize = 4096;
 const PROGRAM_START: usize = 0x200;
+const CLOCK_SPEED_HZ: u32 = 512 * 1024; // 512KHz
+const STEP_TIME: f32 = 1.0f32 / CLOCK_SPEED_HZ as f32;
 
 pub struct Vm {
     reg: [u8; 16],
@@ -13,7 +17,10 @@ pub struct Vm {
     ram: [u8; RAM_SIZE],
 
     timer: u8,
-    tone: u8,
+    t_tick: f32,
+
+    sound_timer: u8,
+    st_tick: f32,
 
     screen: [u8; 64 * 32],
     keys: [u8; 16],
@@ -30,7 +37,10 @@ impl Vm {
             ram: [0; RAM_SIZE],
 
             timer: 0,
-            tone: 0,
+            t_tick: 0.0,
+
+            sound_timer: 0,
+            st_tick: 0.0,
 
             screen: [0; 64 * 32],
             keys: [0; 16],
@@ -54,8 +64,14 @@ impl Vm {
     fn exec(&mut self, op: &Op) -> bool {
         use ops::Instruction::*;
         let ins = Instruction::from_op(op);
-        println!("Executing instruction: 0x{:X} {:?}   v: {:?}", self.pc, ins, self.reg);
+//        if self.timer == 0 {
+//            println!("Executing instruction: 0x{:X} {:?}", self.pc, ins);
+//            println!("v: {:?}", self.reg);
+//            println!("timers: t: {} s: {}", self.timer, self.sound_timer);
+//            self.print_screen();
+//        }
         match ins {
+            // Sys(addr) intentionally left unimplemented.
             Clear => {
                 for b in self.screen.iter_mut() {
                     *b = 0;
@@ -159,6 +175,7 @@ impl Vm {
             LongJump(addr) => {
                 self.pc = (self.reg[0] as u16 + addr) as usize;
             },
+            //TODO Rand(byte) => {}
             Draw(vx, vy, n) => {
                 let x = self.reg[vx as usize] as usize;
                 let y = self.reg[vy as usize] as usize;
@@ -181,16 +198,32 @@ impl Vm {
                     }
                 }
             },
+            //TODO SkipPressed(vx) => {}
+            //TODO SkipNotPressed(vx) => {}
+            GetTimer(vx) => {
+                self.reg[vx as usize] = self.timer;
+            },
+            //TODO WaitKey(vx) => {}
+            SetTimer(vx) => {
+                self.timer = self.reg[vx as usize];
+                self.t_tick = 1.0 / 60.0;
+            },
+            SetSoundTimer(vx) => {
+                self.sound_timer = self.reg[vx as usize];
+                self.st_tick = 1.0 / 60.0;
+            },
             AddToI(vx) => {
                 self.i += self.reg[vx as usize] as usize;
-            }
+            },
+            //TODO LoadHexGlyph(vx) => {}
+            //TODO StoreBCD(vx) => {}
             StoreRegisters(vx) => {
                 let vx = vx as usize;
                 let i = self.i as usize;
 
                 let mut dst = &mut self.ram[i..i+vx+1];
                 for (x,b) in dst.iter_mut().enumerate() {
-                  println!("store reg {} to {}", x, i);
+                  //println!("store reg {} to {}", x, i);
                     *b = self.reg[x];
                 }
             },
@@ -200,7 +233,7 @@ impl Vm {
 
                 let src = &self.ram[i..i+vx+1];
                 for (x,b) in src.iter().enumerate() {
-                  println!("read reg {} from {}", x, i);
+                  //println!("read reg {} from {}", x, i);
                     self.reg[x] = *b;
                 }
             },
@@ -211,14 +244,40 @@ impl Vm {
         return false;
     }
 
-    pub fn step(&mut self) -> bool {
-        let raw = {
-            let codes = &self.ram[self.pc..self.pc+2];
-            ((codes[0] as u16) << 8) | codes[1] as u16
-        };
-        let op = Op::new(raw);
-        self.pc += 2;
-        let idle = self.exec(&op);
+    fn time_step(&mut self) {
+        if self.timer > 0 {
+            self.t_tick -= STEP_TIME;
+            if self.t_tick <= 0.0 {
+                self.timer -= 1;
+                self.t_tick = 1.0 / 60.0;
+            }
+        }
+
+        if self.sound_timer > 0 {
+            self.st_tick -= STEP_TIME;
+            if self.st_tick <= 0.0 {
+                self.sound_timer -= 1;
+                self.st_tick = 1.0 / 60.0;
+            }
+        }
+    }
+
+    // dt: Time in seconds since last step
+    pub fn step(&mut self, dt:f32) -> bool {
+        let steps = (CLOCK_SPEED_HZ as f32 * dt).round() as u32;
+        let mut idle = false;
+
+        for _ in 0u32..steps {
+            let raw = {
+                let codes = &self.ram[self.pc..self.pc+2];
+                ((codes[0] as u16) << 8) | codes[1] as u16
+            };
+            let op = Op::new(raw);
+            self.pc += 2;
+            idle = self.exec(&op);
+            self.time_step();
+            if idle { break; }
+        }
         return idle;
     }
 

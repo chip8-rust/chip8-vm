@@ -74,7 +74,7 @@ pub enum Instruction {
     GetTimer(Vx),           // Fx07 - LD Vx, DT
     WaitKey(Vx),            // Fx0A - LD Vx, K
     SetTimer(Vx),           // Fx15 - LD DT, Vx
-    SetTone(Vx),            // Fx18 - LD ST, Vx
+    SetSoundTimer(Vx),      // Fx18 - LD ST, Vx
     AddToI(Vx),             // Fx1E - ADD I, Vx
     LoadHexGlyph(Vx),       // Fx29 - LD F, Vx
     StoreBCD(Vx),           // Fx33 - LD B, Vx
@@ -132,7 +132,7 @@ impl Instruction {
                     0x07 => GetTimer(op.x()),
                     0x0A => WaitKey(op.x()),
                     0x15 => SetTimer(op.x()),
-                    0x18 => SetTone(op.x()),
+                    0x18 => SetSoundTimer(op.x()),
                     0x1E => AddToI(op.x()),
                     0x29 => LoadHexGlyph(op.x()),
                     0x33 => StoreBCD(op.x()),

@@ -32,11 +32,9 @@ fn main() {
     vm.dump_ram(&mut dump_file);
 
     loop {
-        if vm.step() { break; }
-        io::timer::sleep(Duration::milliseconds(80));
+        if vm.step(0.016) { break; }
+        io::timer::sleep(Duration::milliseconds(16));
+        println!("");
         vm.print_screen();
     }
-    io::timer::sleep(Duration::milliseconds(300));
-    vm.print_screen();
-    //vm.print_disassembly();
 }

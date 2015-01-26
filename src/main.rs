@@ -15,11 +15,17 @@ mod vm;
 fn main() {
     let mut vm = Vm::new();
 
-    //let mut rom_file = File::open(&Path::new("/Users/jakerr/Downloads/IBM Logo.ch8")).unwrap();
-     let mut rom_file = File::open(&Path::new("/Users/jakerr/Downloads/Chip8 Picture.ch8")).unwrap();
-    // let mut rom_file = File::open(&Path::new("/Users/jakerr/Downloads/Fishie [Hap, 2005].ch8")).unwrap();
-    // let mut rom_file = File::open(&Path::new("/Users/jakerr/Downloads/zerod.ch8.txt")).unwrap();
-    // let mut rom_file = File::open(&Path::new("/Users/jakerr/Downloads/sierp.ch8")).unwrap();
+    let roms = [
+        "IBM Logo.ch8",           // 0
+        "Chip8 Picture.ch8",      // 1
+        "Fishie [Hap, 2005].ch8", // 2
+        "zerod.ch8",              // 3
+        "sierp.ch8",              // 4
+    ];
+    let rom_path = Path::new(format!("/Users/jakerr/Downloads/{}", roms[2]));
+
+    let mut rom_file = File::open(&rom_path).unwrap();
+
     match vm.load_rom(&mut rom_file) {
         Ok(size) => println!("Loaded rom size: {}", size),
         Err(e) => println!("Error loading rom: {}", e)

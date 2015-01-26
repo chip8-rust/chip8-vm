@@ -2,6 +2,7 @@ use std::io::{BufWriter, Reader};
 use std::num::Float;
 use error::Ch8Error;
 use ops::{Op, Instruction};
+use std::slice::Chunks;
 
 const RAM_SIZE: usize = 4096;
 const PROGRAM_START: usize = 0x200;
@@ -279,6 +280,10 @@ impl Vm {
             if idle { break; }
         }
         return idle;
+    }
+
+    pub fn screen_rows<'a>(&'a self) -> Chunks<'a, u8> {
+        self.screen.chunks(64)
     }
 
     pub fn print_screen(&self) {

@@ -1,7 +1,3 @@
-//TODO(remove)
-#![allow(dead_code)]
-#![allow(unstable)]
-
 use std::io;
 use std::io::{File};
 use std::time::duration::Duration;

@@ -170,7 +170,7 @@ impl Vm {
                 self.reg[15] = 0;
                 for (sy, byte) in sprite.iter().enumerate() {
                     let dy = (y + sy) % 32;
-                    for sx in range(0, 8) {
+                    for sx in 0us..8 {
                         let px = (*byte >> (7 - sx)) & 0b00000001;
                         let dx = (x + sx) % 64;
                         let idx = dy * 64 + dx;

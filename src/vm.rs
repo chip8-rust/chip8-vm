@@ -4,10 +4,35 @@ use error::Ch8Error;
 use ops::{Op, Instruction};
 use std::slice::Chunks;
 
+use std::rand::Rng;
+use std::rand;
+
 const RAM_SIZE: usize = 4096;
 const PROGRAM_START: usize = 0x200;
 const CLOCK_SPEED_HZ: u32 = 512 * 1024; // 512KHz
 const STEP_TIME: f32 = 1.0f32 / CLOCK_SPEED_HZ as f32;
+
+const FONT_ADDR: usize = 0;
+const FONT_HEIGHT: usize = 5;
+const FONT_BYTES: usize = FONT_HEIGHT * 16;
+const FONT: [u8; FONT_BYTES] = [
+	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+	0x20, 0x60, 0x20, 0x20, 0x70, // 1
+	0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+	0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+	0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+	0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+	0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+	0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+	0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+	0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+	0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+	0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+	0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+	0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+	0xF0, 0x80, 0xF0, 0x80, 0x80, // F
+];
 
 pub struct Vm {
     reg: [u8; 16],
@@ -29,7 +54,7 @@ pub struct Vm {
 
 impl Vm {
     pub fn new() -> Vm {
-        Vm {
+        let mut vm = Vm {
             reg: [0; 16],
             i: 0,
             pc: PROGRAM_START,
@@ -45,7 +70,12 @@ impl Vm {
 
             screen: [0; 64 * 32],
             keys: [0; 16],
+        };
+        {
+            let mut ram = BufWriter::new(&mut vm.ram[FONT_ADDR..(FONT_ADDR + FONT_BYTES)]);
+            ram.write(FONT.as_slice());
         }
+        vm
     }
 
     pub fn load_rom(&mut self, reader: &mut Reader) -> Result<usize, Ch8Error> {
@@ -184,7 +214,9 @@ impl Vm {
             LongJump(addr) => {
                 self.pc = (self.reg[0] as u16 + addr) as usize;
             },
-            //TODO Rand(byte) => {}
+            Rand(vx, byte) => {
+                self.reg[vx as usize] = rand::thread_rng().gen::<u8>() & byte;
+            }
             Draw(vx, vy, n) => {
                 let x = self.reg[vx as usize] as usize;
                 let y = self.reg[vy as usize] as usize;
@@ -207,8 +239,6 @@ impl Vm {
                     }
                 }
             },
-            //TODO SkipPressed(vx) => {}
-            //TODO SkipNotPressed(vx) => {}
             SkipPressed(vx) => {
                 let idx = self.reg[vx as usize];
                 if self.keys[idx as usize] == 1 {
@@ -236,8 +266,22 @@ impl Vm {
             AddToI(vx) => {
                 self.i += self.reg[vx as usize] as usize;
             },
-            //TODO LoadHexGlyph(vx) => {}
-            //TODO StoreBCD(vx) => {}
+            LoadHexGlyph(vx) => {
+                let x = self.reg[vx as usize];
+                self.i = FONT_ADDR + x as usize * FONT_HEIGHT;
+            }
+            StoreBCD(vx) => {
+                let mut x = self.reg[vx as usize];
+
+                let mut place = 100;
+                for i in 0us..2 {
+                    self.i += i;
+                    let bcd = x / place;
+                    self.ram[self.i] = bcd;
+                    x -= bcd;
+                    place /= 10;
+                }
+            }
             StoreRegisters(vx) => {
                 let vx = vx as usize;
                 let i = self.i as usize;

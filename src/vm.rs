@@ -62,6 +62,14 @@ impl Vm {
         writer.write(&self.ram).unwrap();
     }
 
+    pub fn set_key(&mut self, idx: u8) {
+        self.keys[idx as usize] = 1;
+    }
+
+    pub fn unset_key(&mut self, idx: u8) {
+        self.keys[idx as usize] = 0;
+    }
+
     fn exec(&mut self, op: &Op) -> bool {
         use ops::Instruction::*;
         let ins = Instruction::from_op(op);
@@ -201,6 +209,18 @@ impl Vm {
             },
             //TODO SkipPressed(vx) => {}
             //TODO SkipNotPressed(vx) => {}
+            SkipPressed(vx) => {
+                let idx = self.reg[vx as usize];
+                if self.keys[idx as usize] == 1 {
+                    self.pc += 2;
+                }
+            }
+            SkipNotPressed(vx) => {
+                let idx = self.reg[vx as usize];
+                if self.keys[idx  as usize] != 1 {
+                    self.pc += 2;
+                }
+            }
             GetTimer(vx) => {
                 self.reg[vx as usize] = self.timer;
             },

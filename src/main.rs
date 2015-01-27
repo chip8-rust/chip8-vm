@@ -16,6 +16,8 @@ use std::io;
 use std::io::{File};
 use std::time::duration::Duration;
 use quack::Set;
+use input::keyboard::Key;
+use input::Button;
 
 use vm::Vm;
 
@@ -34,7 +36,7 @@ fn main() {
         "sierp.ch8",              // 4
         "pong.ch8",               // 5
     ];
-    let rom_path = Path::new(format!("/Users/jakerr/Downloads/{}", roms[3]));
+    let rom_path = Path::new(format!("/Users/jakerr/Downloads/{}", roms[5]));
 
     let mut rom_file = File::open(&rom_path).unwrap();
 
@@ -61,8 +63,40 @@ fn main() {
 
     let ref mut gl = Gl::new(opengl);
     let window = RefCell::new(window);
+
+    fn keymap(k: Option<Button>) -> Option<u8> {
+        use input::Key::*;
+        if let Some(Button::Keyboard(k)) = k {
+            return match k {
+                D1 => Some(0x1),
+                D2 => Some(0x2),
+                D3 => Some(0x3),
+
+                Q  => Some(0x4),
+                W  => Some(0x5),
+                E  => Some(0x6),
+
+                A  => Some(0x7),
+                S  => Some(0x8),
+                D  => Some(0x9),
+
+                Z  => Some(0xA),
+                X  => Some(0x0),
+                C  => Some(0xB),
+
+                D4 => Some(0xC),
+                R  => Some(0xD),
+                F  => Some(0xE),
+                V  => Some(0xF),
+
+                _ => None
+            }
+        }
+        return None
+    }
+
     for e in event::events(&window) {
-        use event::{ PressEvent, RenderEvent };
+        use event::{ ReleaseEvent, PressEvent, RenderEvent };
 
         if let Some(args) = e.render_args() {
             use graphics::*;
@@ -86,8 +120,11 @@ fn main() {
                 }
             });
         }
-        if let Some(k) = e.press_args() {
-            println!("Press {:?}", k);
+        if let Some(keynum) = keymap(e.press_args()) {
+            vm.set_key(keynum);
+        }
+        if let Some(keynum) = keymap(e.release_args()) {
+            vm.unset_key(keynum);
         }
     }
 }

@@ -92,6 +92,10 @@ impl Vm {
         writer.write(&self.ram).unwrap();
     }
 
+    pub fn beeping(&self) -> bool {
+        self.sound_timer > 0
+    }
+
     pub fn set_key(&mut self, idx: u8) {
         self.keys[idx as usize] = 1;
         if let Some(vx) = self.waiting_on_key {

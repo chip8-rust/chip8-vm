@@ -26,6 +26,8 @@ mod ops;
 mod vm;
 
 const VM_STEPS_PER_UPDATE: u8 = 5;
+const TITLE: &'static str = "Chip8";
+const BEEP_TITLE: &'static str = "♬ Chip8 ♬";
 
 fn main() {
     let mut vm = Vm::new();
@@ -55,7 +57,7 @@ fn main() {
     let window = Sdl2Window::new(
         opengl,
         event::WindowSettings {
-            title: "Chip8".to_string(),
+            title: TITLE.to_string(),
             size: [width, height],
             fullscreen: false,
             exit_on_esc: true,
@@ -104,6 +106,11 @@ fn main() {
             let ddt = args.dt / VM_STEPS_PER_UPDATE as f64;
             for i in 0..VM_STEPS_PER_UPDATE {
                 vm.step(ddt as f32);
+            }
+            if vm.beeping() {
+                (*window.borrow_mut()).window.set_title(BEEP_TITLE);
+            } else {
+                (*window.borrow_mut()).window.set_title(TITLE);
             }
         }
         if let Some(args) = e.render_args() {

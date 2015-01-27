@@ -272,11 +272,10 @@ impl Vm {
                 let mut x = self.reg[vx as usize];
 
                 let mut place = 100;
-                for i in 0us..2 {
-                    self.i += i;
+                for i in 0us..3 {
                     let bcd = x / place;
-                    self.ram[self.i] = bcd;
-                    x -= bcd;
+                    self.ram[self.i + i] = bcd;
+                    x -= bcd * place;
                     place /= 10;
                 }
             }

@@ -281,6 +281,7 @@ impl Vm {
                 for (x,b) in dst.iter_mut().enumerate() {
                     *b = self.reg[x];
                 }
+                self.i += vx+1;
             },
             LoadRegisters(vx) => {
                 let vx = vx as usize;
@@ -290,6 +291,7 @@ impl Vm {
                 for (x,b) in src.iter().enumerate() {
                     self.reg[x] = *b;
                 }
+                self.i += vx+1;
             },
             other => {
                 println!("Instruction not implemented {:?} skipping...", other)

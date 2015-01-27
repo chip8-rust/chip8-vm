@@ -81,7 +81,8 @@ impl Vm {
     pub fn load_rom(&mut self, reader: &mut Reader) -> Result<usize, Ch8Error> {
         let rom = try!(reader.read_to_end());
         if rom.len() > (RAM_SIZE - PROGRAM_START) {
-           return Err(Ch8Error::Io("Rom was larger than available RAM", None))
+            println!("Rom size {}", rom.len());
+            return Err(Ch8Error::Io("Rom was larger than available RAM", None))
         }
         let mut ram = BufWriter::new(&mut self.ram[PROGRAM_START..RAM_SIZE]);
         try!(ram.write(rom.as_slice()));

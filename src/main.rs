@@ -13,6 +13,7 @@ use opengl_graphics::{
 };
 
 use std::io;
+use std::os;
 use std::io::{File};
 use std::time::duration::Duration;
 use quack::Set;
@@ -40,13 +41,19 @@ fn main() {
         "sierp.ch8",              // 4
         "pong.ch8",               // 5
     ];
-    let rom_path = Path::new(format!("/Users/jakerr/Downloads/{}", roms[5]));
+    let mut rom_path = Path::new(format!("/Users/jakerr/Downloads/{}", roms[5]));
+    if os::args().len() > 1 {
+        rom_path = Path::new(os::args()[1].clone());
+    }
 
     let mut rom_file = File::open(&rom_path).unwrap();
 
     match vm.load_rom(&mut rom_file) {
         Ok(size) => println!("Loaded rom size: {}", size),
-        Err(e) => println!("Error loading rom: {}", e)
+        Err(e) => {
+            println!("Error loading rom: {}", e);
+            return;
+        }
     }
 
     let mut dump_file = File::create(&Path::new("/Users/jakerr/tmp/dump.ch8ram")).unwrap();

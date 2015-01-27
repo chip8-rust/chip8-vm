@@ -96,11 +96,13 @@ fn main() {
     }
 
     for e in event::events(&window) {
-        use event::{ ReleaseEvent, PressEvent, RenderEvent };
+        use event::{ ReleaseEvent, UpdateEvent, PressEvent, RenderEvent };
 
+        if let Some(args) = e.update_args() {
+            vm.step(args.dt as f32);
+        }
         if let Some(args) = e.render_args() {
             use graphics::*;
-            vm.step(0.016);
             gl.draw([0, 0, args.width as i32, args.height as i32], |&mut: c, gl| {
                 graphics::clear([0.0, 0.0, 0.0, 1.0], gl);
                 let mut r = Rectangle::new([1.0, 1.0, 1.0, 1.0]);

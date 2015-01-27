@@ -9,8 +9,6 @@ use std::rand;
 
 const RAM_SIZE: usize = 4096;
 const PROGRAM_START: usize = 0x200;
-const CLOCK_SPEED_HZ: u32 = 512 * 1024; // 512KHz
-const STEP_TIME: f32 = 1.0f32 / CLOCK_SPEED_HZ as f32;
 
 const FONT_ADDR: usize = 0;
 const FONT_HEIGHT: usize = 5;
@@ -309,9 +307,9 @@ impl Vm {
         return false;
     }
 
-    fn time_step(&mut self) {
+    fn time_step(&mut self, dt:f32) {
         if self.timer > 0 {
-            self.t_tick -= STEP_TIME;
+            self.t_tick -= dt;
             if self.t_tick <= 0.0 {
                 self.timer -= 1;
                 self.t_tick = 1.0 / 60.0;
@@ -319,7 +317,7 @@ impl Vm {
         }
 
         if self.sound_timer > 0 {
-            self.st_tick -= STEP_TIME;
+            self.st_tick -= dt;
             if self.st_tick <= 0.0 {
                 self.sound_timer -= 1;
                 self.st_tick = 1.0 / 60.0;
@@ -329,20 +327,16 @@ impl Vm {
 
     // dt: Time in seconds since last step
     pub fn step(&mut self, dt:f32) -> bool {
-        let steps = (CLOCK_SPEED_HZ as f32 * dt).round() as u32;
         let mut idle = false;
 
-        for _ in 0u32..steps {
-            let raw = {
-                let codes = &self.ram[self.pc..self.pc+2];
-                ((codes[0] as u16) << 8) | codes[1] as u16
-            };
-            let op = Op::new(raw);
-            self.pc += 2;
-            idle = self.exec(&op);
-            self.time_step();
-            if idle { break; }
-        }
+        let raw = {
+            let codes = &self.ram[self.pc..self.pc+2];
+            ((codes[0] as u16) << 8) | codes[1] as u16
+        };
+        let op = Op::new(raw);
+        self.pc += 2;
+        idle = self.exec(&op);
+        self.time_step(dt);
         return idle;
     }
 

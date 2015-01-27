@@ -101,12 +101,6 @@ impl Vm {
     fn exec(&mut self, op: &Op) -> bool {
         use ops::Instruction::*;
         let ins = Instruction::from_op(op);
-//        if self.timer == 0 {
-//            println!("Executing instruction: 0x{:X} {:?}", self.pc, ins);
-//            println!("v: {:?}", self.reg);
-//            println!("timers: t: {} s: {}", self.timer, self.sound_timer);
-//            self.print_screen();
-//        }
         match ins {
             // Sys(addr) intentionally left unimplemented.
             Clear => {
@@ -285,7 +279,6 @@ impl Vm {
 
                 let mut dst = &mut self.ram[i..i+vx+1];
                 for (x,b) in dst.iter_mut().enumerate() {
-                  //println!("store reg {} to {}", x, i);
                     *b = self.reg[x];
                 }
             },
@@ -295,7 +288,6 @@ impl Vm {
 
                 let src = &self.ram[i..i+vx+1];
                 for (x,b) in src.iter().enumerate() {
-                  //println!("read reg {} from {}", x, i);
                     self.reg[x] = *b;
                 }
             },

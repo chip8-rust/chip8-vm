@@ -25,6 +25,8 @@ mod error;
 mod ops;
 mod vm;
 
+const VM_STEPS_PER_UPDATE: u8 = 5;
+
 fn main() {
     let mut vm = Vm::new();
 
@@ -99,7 +101,10 @@ fn main() {
         use event::{ ReleaseEvent, UpdateEvent, PressEvent, RenderEvent };
 
         if let Some(args) = e.update_args() {
-            vm.step(args.dt as f32);
+            let ddt = args.dt / VM_STEPS_PER_UPDATE as f64;
+            for i in 0..VM_STEPS_PER_UPDATE {
+                vm.step(ddt as f32);
+            }
         }
         if let Some(args) = e.render_args() {
             use graphics::*;

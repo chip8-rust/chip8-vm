@@ -7,8 +7,11 @@ use std::slice::Chunks;
 use std::rand::Rng;
 use std::rand;
 
+use std::num::Float;
+
 const RAM_SIZE: usize = 4096;
 const PROGRAM_START: usize = 0x200;
+const CLOCK_HZ: f32 = 600.0;
 
 const FONT_ADDR: usize = 0;
 const FONT_HEIGHT: usize = 5;
@@ -332,18 +335,24 @@ impl Vm {
 
     // dt: Time in seconds since last step
     pub fn step(&mut self, dt:f32) {
-        self.time_step(dt);
-        if self.waiting_on_key.is_some() {
-            return;
-        }
 
-        let raw = {
-            let codes = &self.ram[self.pc..self.pc+2];
-            ((codes[0] as u16) << 8) | codes[1] as u16
-        };
-        let op = Op::new(raw);
-        self.pc += 2;
-        self.exec(&Instruction::from_op(&op));
+        let sub_steps = (CLOCK_HZ * dt).round() as usize;
+        let ddt = dt / sub_steps as f32;
+
+        for _ in 0..sub_steps {
+            self.time_step(ddt);
+            if self.waiting_on_key.is_some() {
+                return;
+            }
+
+            let raw = {
+                let codes = &self.ram[self.pc..self.pc+2];
+                ((codes[0] as u16) << 8) | codes[1] as u16
+            };
+            let op = Op::new(raw);
+            self.pc += 2;
+            self.exec(&Instruction::from_op(&op));
+        }
     }
 
     pub fn screen_rows<'a>(&'a self) -> Chunks<'a, u8> {

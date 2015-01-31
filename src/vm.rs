@@ -92,6 +92,7 @@ impl Vm {
         return Ok(rom.len());
     }
 
+    #[allow(dead_code)]
     pub fn dump_ram(&self, writer: &mut Writer) {
         writer.write_all(&self.ram).unwrap();
     }
@@ -359,7 +360,7 @@ impl Vm {
         self.screen.chunks(64)
     }
 
-    #[cfg(debug)]
+    #[allow(dead_code)]
     pub fn print_screen(&self) {
         for row in self.screen.chunks(64) {
             println!("");
@@ -372,7 +373,7 @@ impl Vm {
         }
     }
 
-    #[cfg(debug)]
+    #[allow(dead_code)]
     pub fn print_disassembly(&self) {
         for i in self.ram.chunks(2) {
             match i {

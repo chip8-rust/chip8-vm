@@ -26,6 +26,7 @@ use opengl_graphics::{
 
 use std::os;
 use std::old_io::File;
+use std::old_io::BufReader;
 // use std::time::duration::Duration;
 use quack::Set;
 // use input::keyboard::Key;
@@ -40,34 +41,37 @@ mod vm;
 const TITLE: &'static str = "Chip8";
 const BEEP_TITLE: &'static str = "♬ Chip8 ♬";
 
+const INTRO_ROM: &'static [u8] = include_bytes!("intro/intro.ch8");
+
 fn main() {
     let mut vm = Vm::new();
 
-    let roms = [
-        "IBM Logo.ch8",           // 0
-        "Chip8 Picture.ch8",      // 1
-        "Fishie [Hap, 2005].ch8", // 2
-        "zerod.ch8",              // 3
-        "sierp.ch8",              // 4
-        "pong.ch8",               // 5
-    ];
-    let mut rom_path = Path::new(format!("/Users/jakerr/Downloads/{}", roms[5]));
+    let mut rom: Option<File> = None;
+
     if os::args().len() > 1 {
-        rom_path = Path::new(os::args()[1].clone());
+        if let Ok(f) = File::open(&Path::new(os::args()[1].clone())) {
+            rom = Some(f);
+        } else {
+            println!("Could not open rom {}", os::args()[1]);
+        }
     }
 
-    let mut rom_file = File::open(&rom_path).unwrap();
+    let intro_reader = &mut BufReader::new(INTRO_ROM) as &mut Reader;
+    let mut rom_reader = match &mut rom {
+        &mut Some(ref mut r) => r as &mut Reader,
+        _ => {
+            println!("You can provide a path to a chip8 binary to interpret it.");
+            intro_reader
+        }
+    };
 
-    match vm.load_rom(&mut rom_file) {
+    match vm.load_rom(rom_reader) {
         Ok(size) => println!("Loaded rom size: {}", size),
         Err(e) => {
             println!("Error loading rom: {}", e);
             return;
         }
     }
-
-    let mut dump_file = File::create(&Path::new("/Users/jakerr/tmp/dump.ch8ram")).unwrap();
-    vm.dump_ram(&mut dump_file);
 
     let (width, height) = (800, 400);
     let opengl = shader_version::OpenGL::_3_2;

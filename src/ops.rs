@@ -13,7 +13,7 @@ impl Op {
         Op{ raw: raw }
     }
 
-    #[cfg(debug)]
+    #[allow(dead_code)]
     pub fn raw(&self) -> u16 {
         self.raw
     }

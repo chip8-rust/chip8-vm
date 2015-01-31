@@ -10,6 +10,22 @@ Status
 * Sound is not supported but is faked by updating the title bar with a note
 symbol when sound should be playing.
 
+Usage
+==
+
+```
+> cargo build
+> ./target/chip8 [path_to_ch8_binary]
+```
+
+Controls are mapped to these 16 buttons:
+
+  1  |  2  |  3  |  4
+-----|-----|-----|-----
+  Q  |  W  |  E  |  R
+  A  |  S  |  D  |  F
+  Z  |  X  |  C  |  V
+
 Spec
 ==
 I used these two resources as the spec for my vm:

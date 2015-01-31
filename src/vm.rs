@@ -109,10 +109,9 @@ impl Vm {
         self.keys[idx as usize] = 0;
     }
 
-    fn exec(&mut self, op: &Op) -> bool {
+    fn exec(&mut self, ins: &Instruction) -> bool {
         use ops::Instruction::*;
-        let ins = Instruction::from_op(op);
-        match ins {
+        match *ins {
             // Sys(addr) intentionally left unimplemented.
             Clear => {
                 for b in self.screen.iter_mut() {
@@ -200,7 +199,7 @@ impl Vm {
                 let y = self.reg[vy as usize];
 
                 // VF is msb before shift
-                self.reg[15] =  0x80 & y;
+                self.reg[15] = y >> 7;
 
                 self.reg[vx as usize] = y << 1;
             }
@@ -306,7 +305,7 @@ impl Vm {
                 }
                 self.i += vx+1;
             },
-            other => {
+            ref other => {
                 println!("Instruction not implemented {:?} skipping...", other)
             }
         }
@@ -344,7 +343,7 @@ impl Vm {
         };
         let op = Op::new(raw);
         self.pc += 2;
-        self.exec(&op);
+        self.exec(&Instruction::from_op(&op));
     }
 
     pub fn screen_rows<'a>(&'a self) -> Chunks<'a, u8> {
@@ -382,4 +381,155 @@ impl Vm {
             }
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ops::*;
+
+    macro_rules! reg_test {
+        (
+            $name:ident {
+                before: {$($reg_before:expr => $reg_before_val:expr),+},
+                after:  {$($reg_after:expr => $reg_after_val:expr),+},
+                overflow: $over:expr,
+                ins: $ins:expr
+            }
+        ) =>
+        (
+            //let mut vm = Vm::new();
+            #[test]
+            fn $name() {
+                let mut vm = Vm::new();
+                $(
+                    vm.reg[$reg_before] = $reg_before_val;
+                )+
+                vm.exec(&$ins);
+                $(
+                    assert!(vm.reg[$reg_after] == $reg_after_val);
+                )+
+                let overflow = 15;
+                assert!(vm.reg[overflow] == $over, "overflow was {}, wanted {}", vm.reg[overflow], $over);
+            }
+        )
+    }
+
+    // Add
+    reg_test!(
+        add_vx {
+        before: { 2 => 0xFE, 3 => 0x01 },
+        after: { 2 => 0xFF, 3 => 0x01 },
+        overflow: 0,
+        ins: Instruction::Add(2,3)
+    });
+
+    reg_test!(
+        add_vx_overflows {
+        before: { 2 => 0xFF, 3 => 0x01 },
+        after: { 2 => 0x00, 3 => 0x01 },
+        overflow: 1,
+        ins: Instruction::Add(2,3)
+    });
+
+    // AddK
+    reg_test!(
+        add_k {
+        before: { 0 => 0x09 },
+        after: { 0 => 0x0B },
+        overflow: 0,
+        ins: Instruction::AddK(0,2)
+    });
+
+    reg_test!(
+        add_k_overflows {
+        before: { 0 => 0xFF },
+        after: { 0 => 0x01 },
+        overflow: 0, // Un-intuitive but not spec'd to set overflow
+        ins: Instruction::AddK(0,2)
+    });
+
+    // Sub
+    reg_test!(
+        sub {
+        before: { 0 => 0x3, 1 => 0x2 },
+        after:  { 0 => 0x1, 1 => 0x2 },
+        overflow: 1, // Defined as not-borrowed
+        ins: Instruction::Sub(0,1)
+    });
+
+    reg_test!(
+        sub_borrow {
+        before: { 0 => 0x3, 1 => 0x5 },
+        after:  { 0 => 0xFE, 1 => 0x5 },
+        overflow: 0, // Defined as not-borrowed
+        ins: Instruction::Sub(0,1)
+    });
+
+    // SubInv
+    reg_test!(
+        sub_inv {
+        before: { 0 => 0x2, 1 => 0x3 },
+        after:  { 0 => 0x1, 1 => 0x3 },
+        overflow: 1, // Defined as not-borrowed
+        ins: Instruction::SubInv(0,1)
+    });
+
+    reg_test!(
+        sub_inv_borrow {
+        before: { 0 => 0x5, 1 => 0x3 },
+        after:  { 0 => 0xFE, 1 => 0x3 },
+        overflow: 0, // Defined as not-borrowed
+        ins: Instruction::SubInv(0,1)
+    });
+
+    // ShiftLeft
+    reg_test!(
+        shiftl_vx_vy {
+        before: { 2 => 0xBB, 3 => 0x02 },
+        after:  { 2 => 0x04, 3 => 0x02 },
+        overflow: 0,
+        ins: Instruction::ShiftLeft(2,3)
+    });
+
+    reg_test!(
+        shiftl_vx_inplace {
+        before: { 2 => 0b0111_0111 },
+        after:  { 2 => 0b1110_1110 },
+        overflow: 0,
+        ins: Instruction::ShiftLeft(2,2)
+    });
+
+    reg_test!(
+        shiftl_vx_inplace_overflow {
+        before: { 2 => 0b1111_1111 },
+        after:  { 2 => 0b1111_1110 },
+        overflow: 1,
+        ins: Instruction::ShiftLeft(2,2)
+    });
+
+    // ShiftRight
+    reg_test!(
+        shiftr_vx_vy {
+        before: { 2 => 0xBB, 3 => 0x04 },
+        after:  { 2 => 0x02, 3 => 0x04 },
+        overflow: 0,
+        ins: Instruction::ShiftRight(2,3)
+    });
+
+    reg_test!(
+        shiftr_vx_inplace {
+        before: { 2 => 0b1110_1110 },
+        after:  { 2 => 0b0111_0111 },
+        overflow: 0,
+        ins: Instruction::ShiftRight(2,2)
+    });
+
+    reg_test!(
+        shiftr_vx_inplace_overflow {
+        before: { 2 => 0b1111_1111 },
+        after:  { 2 => 0b0111_1111 },
+        overflow: 1,
+        ins: Instruction::ShiftRight(2,2)
+    });
 }

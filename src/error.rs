@@ -1,5 +1,5 @@
 use std::fmt; 
-use std::io::{IoError};
+use std::old_io::{IoError};
 use std::error::{Error, FromError};
 
 pub enum Ch8Error {

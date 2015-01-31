@@ -1,23 +1,32 @@
+// TODO revisit these after 1.0.0beta
+#![feature(collections)]
+#![feature(core)]
+#![feature(io)]
+#![feature(os)]
+#![feature(path)]
+#![feature(rand)]
+
 extern crate shader_version;
 extern crate input;
 extern crate event;
 extern crate graphics;
 extern crate sdl2_window;
+extern crate window;
 extern crate opengl_graphics;
 extern crate quack;
 
 use std::cell::RefCell;
 use sdl2_window::Sdl2Window;
+use window::WindowSettings;
 use opengl_graphics::{
     Gl,
 };
 
-use std::io;
 use std::os;
-use std::io::{File};
-use std::time::duration::Duration;
+use std::old_io::File;
+// use std::time::duration::Duration;
 use quack::Set;
-use input::keyboard::Key;
+// use input::keyboard::Key;
 use input::Button;
 
 use vm::Vm;
@@ -63,7 +72,7 @@ fn main() {
     let opengl = shader_version::OpenGL::_3_2;
     let window = Sdl2Window::new(
         opengl,
-        event::WindowSettings {
+        WindowSettings {
             title: TITLE.to_string(),
             size: [width, height],
             fullscreen: false,
@@ -111,7 +120,7 @@ fn main() {
 
         if let Some(args) = e.update_args() {
             let ddt = args.dt / VM_STEPS_PER_UPDATE as f64;
-            for i in 0..VM_STEPS_PER_UPDATE {
+            for _ in 0..VM_STEPS_PER_UPDATE {
                 vm.step(ddt as f32);
             }
             if vm.beeping() {
@@ -124,7 +133,7 @@ fn main() {
             use graphics::*;
             gl.draw([0, 0, args.width as i32, args.height as i32], |&mut: c, gl| {
                 graphics::clear([0.0, 0.0, 0.0, 1.0], gl);
-                let mut r = Rectangle::new([1.0, 1.0, 1.0, 1.0]);
+                let r = Rectangle::new([1.0, 1.0, 1.0, 1.0]);
                 let off = Color([0.0, 0.0, 0.0, 1.0]);
                 let on = Color([1.0, 1.0, 1.0, 1.0]);
 

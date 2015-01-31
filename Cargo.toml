@@ -22,6 +22,9 @@ git = "https://github.com/pistondevelopers/shader_version"
 [dependencies.pistoncore-input]
 git = "https://github.com/pistondevelopers/input"
 
+[dependencies.pistoncore-window]
+git = "https://github.com/pistondevelopers/window"
+
 [dependencies.quack]
 git = "https://github.com/pistondevelopers/quack"
 

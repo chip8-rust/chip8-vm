@@ -1,5 +1,5 @@
-use std::io::{BufWriter, Reader};
-use std::num::Float;
+use std::old_io::{BufWriter, Reader};
+// use std::num::Float;
 use error::Ch8Error;
 use ops::{Op, Instruction};
 use std::slice::Chunks;
@@ -73,7 +73,7 @@ impl Vm {
         };
         {
             let mut ram = BufWriter::new(&mut vm.ram[FONT_ADDR..(FONT_ADDR + FONT_BYTES)]);
-            ram.write(FONT.as_slice());
+            ram.write_all(FONT.as_slice()).unwrap();
         }
         vm
     }
@@ -85,12 +85,12 @@ impl Vm {
             return Err(Ch8Error::Io("Rom was larger than available RAM", None))
         }
         let mut ram = BufWriter::new(&mut self.ram[PROGRAM_START..RAM_SIZE]);
-        try!(ram.write(rom.as_slice()));
+        try!(ram.write_all(rom.as_slice()));
         return Ok(rom.len());
     }
 
     pub fn dump_ram(&self, writer: &mut Writer) {
-        writer.write(&self.ram).unwrap();
+        writer.write_all(&self.ram).unwrap();
     }
 
     pub fn beeping(&self) -> bool {
@@ -350,6 +350,7 @@ impl Vm {
         self.screen.chunks(64)
     }
 
+    #[cfg(debug)]
     pub fn print_screen(&self) {
         for row in self.screen.chunks(64) {
             println!("");
@@ -362,6 +363,7 @@ impl Vm {
         }
     }
 
+    #[cfg(debug)]
     pub fn print_disassembly(&self) {
         for i in self.ram.chunks(2) {
             match i {

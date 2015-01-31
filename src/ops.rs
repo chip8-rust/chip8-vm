@@ -13,6 +13,7 @@ impl Op {
         Op{ raw: raw }
     }
 
+    #[cfg(debug)]
     pub fn raw(&self) -> u16 {
         self.raw
     }

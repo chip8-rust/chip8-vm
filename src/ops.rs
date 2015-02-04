@@ -44,7 +44,7 @@ impl Op {
     }
 }
 
-#[derive(Show)]
+#[derive(Debug)]
 pub enum Instruction {
     Sys(Addr),              // 0nnn - SYS addr
     Clear,                  // 00E0 - CLS

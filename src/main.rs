@@ -1,7 +1,6 @@
 #![cfg_attr(test, allow(dead_code))]
 
 // TODO revisit these after 1.0.0beta
-#![feature(collections)]
 #![feature(core)]
 #![feature(io)]
 #![feature(os)]

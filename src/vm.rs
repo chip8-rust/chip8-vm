@@ -36,6 +36,7 @@ const FONT: [u8; FONT_BYTES] = [
 	0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 ];
 
+#[derive(Copy)]
 pub struct Vm {
     reg: [u8; 16],
     i: usize,

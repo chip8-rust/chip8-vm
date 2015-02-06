@@ -1,11 +1,12 @@
+extern crate rand;
+
 use std::old_io::{BufWriter, Reader};
 // use std::num::Float;
 use error::Ch8Error;
 use ops::{Op, Instruction};
 use std::slice::Chunks;
 
-use std::rand::Rng;
-use std::rand;
+use rand::Rng;
 
 use std::num::Float;
 

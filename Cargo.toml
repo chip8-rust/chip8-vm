@@ -12,3 +12,6 @@ authors = [
     "Jake Kerr <kodafox@gmail.com>",
     "robo9k <robo@9k.lv>",
 ]
+
+[dependencies]
+rand = "0.1.2"

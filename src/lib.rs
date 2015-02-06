@@ -5,6 +5,8 @@
 // for `BufWriter` and such
 #![feature(io)]
 
+extern crate rand;
+
 pub mod error;
 pub mod ops;
 pub mod vm;

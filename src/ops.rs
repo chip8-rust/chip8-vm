@@ -1,8 +1,8 @@
-type Vx = u8;
-type Vy = u8;
-type Addr = u16;
-type Byte = u8;
-type Nibble = u8;
+pub type Vx = u8;
+pub type Vy = u8;
+pub type Addr = u16;
+pub type Byte = u8;
+pub type Nibble = u8;
 
 pub struct Op {
     raw: u16

@@ -15,7 +15,7 @@ Usage
 
 ```
 > cargo build
-> ./target/chip8 [path_to_ch8_binary]
+> cargo run [path_to_ch8_rom]
 ```
 
 Controls are mapped to these 16 buttons:

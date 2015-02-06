@@ -1,5 +1,14 @@
 [package]
 
 name = "chip8_vm"
+description = "Virtual machine for the CHIP-8 programming language"
+readme = "../README.md"
+license = "MIT"
+keywords = ["vm", "chip-8",]
+homepage = "https://github.com/jakerr/chip8-rust"
+repository = "https://github.com/jakerr/chip8-rust.git"
 version = "0.0.1"
-authors = ["robo9k <robo@9k.lv>"]
+authors = [
+    "Jake Kerr <kodafox@gmail.com>",
+    "robo9k <robo@9k.lv>",
+]

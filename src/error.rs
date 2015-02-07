@@ -2,35 +2,33 @@ use std::fmt;
 use std::old_io::{IoError};
 use std::error::{Error, FromError};
 
-pub enum Ch8Error {
+pub enum Chip8Error {
     Io(&'static str, Option<IoError>),
 }
 
-impl fmt::Display for Ch8Error {
+impl fmt::Display for Chip8Error {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         return write!(fmt, "{}", self.description())
     }
 }
 
-impl Error for Ch8Error {
+impl Error for Chip8Error {
     fn description(&self) -> &str {
-        use self::Ch8Error::*;
         match *self {
-            Io(desc, _) => desc
+            Chip8Error::Io(desc, _) => desc,
         }
     }
 
     fn cause(&self) -> Option<&Error> {
-        use self::Ch8Error::*;
         match *self {
-            Io(_, Some(ref cause)) => Some(cause),
-            _ => None
+            Chip8Error::Io(_, Some(ref cause)) => Some(cause),
+            _ => None,
         }
     }
 }
 
-impl FromError<IoError> for Ch8Error {
-    fn from_error(err: IoError) -> Ch8Error {
-        Ch8Error::Io("Internal IO error: ", Some(err))
+impl FromError<IoError> for Chip8Error {
+    fn from_error(err: IoError) -> Chip8Error {
+        Chip8Error::Io("Internal IO error: ", Some(err))
     }
 }

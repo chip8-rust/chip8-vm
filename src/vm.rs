@@ -2,7 +2,7 @@ extern crate rand;
 
 use std::old_io::{BufWriter, Reader};
 // use std::num::Float;
-use error::Ch8Error;
+use error::Chip8Error;
 use ops::{Op, Instruction};
 use std::slice::Chunks;
 
@@ -83,11 +83,11 @@ impl Vm {
         vm
     }
 
-    pub fn load_rom(&mut self, reader: &mut Reader) -> Result<usize, Ch8Error> {
+    pub fn load_rom(&mut self, reader: &mut Reader) -> Result<usize, Chip8Error> {
         let rom = try!(reader.read_to_end());
         if rom.len() > (RAM_SIZE - PROGRAM_START) {
             println!("Rom size {}", rom.len());
-            return Err(Ch8Error::Io("Rom was larger than available RAM", None))
+            return Err(Chip8Error::Io("ROM was larger than available RAM", None))
         }
         let mut ram = BufWriter::new(&mut self.ram[PROGRAM_START..RAM_SIZE]);
         try!(ram.write_all(rom.as_slice()));

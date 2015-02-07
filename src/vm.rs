@@ -546,4 +546,15 @@ mod tests {
         overflow: 1,
         ins: Instruction::ShiftRight(2,2)
     });
+
+    #[test]
+    fn oversized_rom() {
+        use std::old_io::MemReader;
+
+        let mut vm = Vm::new();
+        let rom_size = super::RAM_SIZE + 1;
+        let rom: Vec<u8> = (0..rom_size).map(|_| 0).collect();
+
+        assert!(vm.load_rom(&mut MemReader::new(rom)).is_err());
+    }
 }

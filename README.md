@@ -1,37 +1,40 @@
-Chip-8 interpreter in Rust
+Virtual Machine for the CHIP-8 programming language
 ==
-This is an educational/toy project for me to get some more practice coding in
-Rust / organizing modules, testing etc. Feedback is more than welcome!
+This crate implements a virtual machine of the CHIP-8 programming language. It
+can be used as the back end for CHIP-8 emulator projects / debuggers etc.
 
 Status
 ==
 * All 35 original Chip-8 instructions are implemented.
-* Graphics are implemented with [Piston](http://www.piston.rs/).
-* Sound is not supported but is faked by updating the title bar with a note
-symbol when sound should be playing.
 
 Usage
 ==
+This crate does not depend on additional system libraries, it only depends on
+other Rust crates.  It can be used as a back end for your own emulator by
+adding it as a dependency in your `Cargo.toml`.
 
+To depend on the latest released version that we host on [crates.io] (https://crates.io/crates/chip8_vm):
+
+```toml
+[dependencies]
+chip8_vm = "0.*"
 ```
-> cargo build
-> cargo run [path_to_ch8_rom]
+
+To depend on the development version:
+```toml
+[dependencies.chip8_vm]
+git = "https://github.com/jakerr/chip8-rust"
 ```
 
-Controls are mapped to these 16 buttons:
-
-  1  |  2  |  3  |  4
------|-----|-----|-----
-  Q  |  W  |  E  |  R
-  A  |  S  |  D  |  F
-  Z  |  X  |  C  |  V
+See an example integration with a UI in the [chip8_ui](https://github.com/jakerr/chip8-rust/blob/master/src/main.rs) crate.
 
 Spec
 ==
-I used these two resources as the spec for my vm:
+These two resources were used as the spec for this vm:
 * [Cowgod's Chip-8 Technical Reference v1.0](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
 * [Mastering Chip-8 By Matthew Mikolay](http://mattmik.com/chip8.html)
-They were both incredibly helpful so thanks to the authors!
+
+They were both incredibly helpful. Our thanks to the authors!
 
 Licence
 ==

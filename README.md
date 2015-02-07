@@ -23,10 +23,10 @@ chip8_vm = "0.*"
 To depend on the development version:
 ```toml
 [dependencies.chip8_vm]
-git = "https://github.com/jakerr/chip8-rust"
+git = "https://github.com/chip8-rust/chip8-rust"
 ```
 
-See an example integration with a UI in the [chip8_ui](https://github.com/jakerr/chip8-rust/blob/master/src/main.rs) crate.
+See an example integration with a UI in the [chip8_ui](https://github.com/chip8-rust/chip8-rust/blob/master/src/main.rs) crate.
 
 Spec
 ==

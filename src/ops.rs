@@ -1,14 +1,22 @@
 //! Opcode and instruction abstractions
 
 /// First register in an opcode
+///
+/// There are 16 registers, `V0`..`VF`
 pub type Vx = u8;
 /// Second register in an opcode
 pub type Vy = u8;
 /// Absolute memory address
+///
+/// Valid addresses are within `0x0` .. `0xFFF`.
 pub type Addr = u16;
 /// A byte
+///
+/// Valid values are within `0x0` .. `0xFF`.
 pub type Byte = u8;
 /// A nibble (hex digit)
+///
+/// Valid values are within `0x0` .. `0xF`.
 pub type Nibble = u8;
 
 
@@ -55,8 +63,6 @@ impl Op {
 }
 
 /// Machine instruction
-///
-/// An instruction is a higher level view of an opcode.
 #[derive(Copy,Debug)]
 pub enum Instruction {
     Sys(Addr),              // 0nnn - SYS addr

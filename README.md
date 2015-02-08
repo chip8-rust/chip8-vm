@@ -26,7 +26,8 @@ To depend on the development version:
 git = "https://github.com/chip8-rust/chip8-rust"
 ```
 
-See an example integration with a UI in the [chip8_ui](https://github.com/chip8-rust/chip8-rust/blob/master/src/main.rs) crate.
+See an example integration with a UI in the [chip8_ui](https://github.com/chip8-rust/chip8-rust/blob/master/src/main.rs) crate code.
+For further information, take a look at the [`chip8_vm` rustdoc](https://chip8-rust.github.io/chip8-rust/chip8_vm/).
 
 Spec
 ==

@@ -4,7 +4,9 @@ use std::fmt;
 use std::old_io::{IoError};
 use std::error::{Error, FromError};
 
+/// `Error` variants for public errors in this crate
 pub enum Chip8Error {
+    /// I/O error
     Io(&'static str, Option<IoError>),
 }
 

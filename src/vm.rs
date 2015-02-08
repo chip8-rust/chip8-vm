@@ -38,6 +38,11 @@ const FONT: [u8; FONT_BYTES] = [
 	0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 ];
 
+/// Virtual machine
+///
+/// A virtual machine manages state like its registers,
+/// the RAM, stack, screen pixels, pressed keys as well as
+/// timers and some internal state.
 #[derive(Copy)]
 pub struct Vm {
     reg: [u8; 16],

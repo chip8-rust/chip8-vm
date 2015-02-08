@@ -1,11 +1,18 @@
 //! Opcode and instruction abstractions
 
+/// First register in an opcode
 pub type Vx = u8;
+/// Second register in an opcode
 pub type Vy = u8;
+/// Absolute memory address
 pub type Addr = u16;
+/// A byte
 pub type Byte = u8;
+/// A nibble (hex digit)
 pub type Nibble = u8;
 
+
+/// Assembly opcode
 #[derive(Copy)]
 pub struct Op {
     raw: u16
@@ -47,6 +54,9 @@ impl Op {
     }
 }
 
+/// Machine instruction
+///
+/// An instruction is a higher level view of an opcode.
 #[derive(Copy,Debug)]
 pub enum Instruction {
     Sys(Addr),              // 0nnn - SYS addr

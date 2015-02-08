@@ -409,7 +409,7 @@ impl Vm {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ops::*;
+    use instructions::*;
 
     macro_rules! reg_test {
         (

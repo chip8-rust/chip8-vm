@@ -1,3 +1,5 @@
+//! Opcode and instruction abstractions
+
 pub type Vx = u8;
 pub type Vy = u8;
 pub type Addr = u16;

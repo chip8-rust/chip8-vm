@@ -1,3 +1,5 @@
+//! `std:error:Error` implementations
+
 use std::fmt;
 use std::old_io::{IoError};
 use std::error::{Error, FromError};

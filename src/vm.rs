@@ -1,3 +1,5 @@
+//! Virtual machine implementation
+
 extern crate rand;
 
 use std::old_io::{BufWriter, Reader};

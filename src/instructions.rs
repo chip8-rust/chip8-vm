@@ -1,4 +1,4 @@
-//! Opcode and instruction abstractions
+//! Raw and high-level instruction abstractions
 
 /// First register in an opcode
 ///
@@ -20,49 +20,60 @@ pub type Byte = u8;
 pub type Nibble = u8;
 
 
-/// Assembly opcode
+/// Raw instruction
+///
+/// Helper around the raw bits, not necessarily a valid instruction.
 #[derive(Copy)]
-pub struct Op {
-    raw: u16
+pub struct RawInstruction {
+    bits: u16
 }
 
-impl Op {
-    pub fn new(raw: u16) -> Op {
-        Op{ raw: raw }
+impl RawInstruction {
+    /// Creates a new raw instruction without any checks of the `bits`
+    pub fn new(bits: u16) -> RawInstruction {
+        RawInstruction{ bits: bits }
     }
 
+    /// The *raw bits*
     #[allow(dead_code)]
-    pub fn raw(&self) -> u16 {
-        self.raw
+    pub fn bits(&self) -> u16 {
+        self.bits
     }
 
+    /// The *address bits* part
     pub fn addr(&self) -> Addr {
-        self.raw & 0x0FFF
+        self.bits & 0x0FFF
     }
 
+    /// The *index of the `Vx` register* part
     pub fn x(&self) -> Vx {
-        ((self.raw & 0x0F00) >> 8) as u8
+        ((self.bits & 0x0F00) >> 8) as u8
     }
 
+    /// The *index of the `Vy` register* part
     pub fn y(&self) -> Vy {
-        ((self.raw & 0x00F0) >> 4) as u8
+        ((self.bits & 0x00F0) >> 4) as u8
     }
 
+    /// The *high nibble* part
     pub fn n_high(&self) -> Nibble {
-        ((self.raw & 0xF000) >> 12) as u8
+        ((self.bits & 0xF000) >> 12) as u8
     }
 
+    /// The *low nibble* part
     pub fn n_low(&self) -> Nibble {
-        (self.raw & 0x000F) as u8
+        (self.bits & 0x000F) as u8
     }
 
-
+    /// The *`k` byte* part
     pub fn k(&self) -> Byte {
-        (self.raw & 0x00FF) as u8
+        (self.bits & 0x00FF) as u8
     }
 }
 
-/// Machine instruction
+/// High-level instruction
+///
+/// A valid instruction that can be executed as-is.
 #[derive(Copy,Debug)]
 pub enum Instruction {
     Sys(Addr),              // 0nnn - SYS addr
@@ -104,60 +115,63 @@ pub enum Instruction {
 }
 
 impl Instruction {
-    pub fn from_op(op: &Op) -> Instruction {
-        use ops::Instruction::*;
-        match op.n_high() {
+    /// Creates a new instruction from raw bits,
+    /// or `Instruction::Unknown` if no valid match could be found
+    pub fn from_raw(raw: &RawInstruction) -> Instruction {
+        use self::Instruction::*;
+
+        match raw.n_high() {
             0x0 => {
-                match op.k() {
+                match raw.k() {
                     0xE0 => Clear,
                     0xEE => Return,
-                    _ => Sys(op.addr())
+                    _ => Sys(raw.addr())
                 }
             },
-            0x1 => Jump(op.addr()),
-            0x2 => Call(op.addr()),
-            0x3 => SkipEqualK(op.x(), op.k()),
-            0x4 => SkipNotEqualK(op.x(), op.k()),
-            0x5 => SkipEqual(op.x(), op.y()),
-            0x6 => SetK(op.x(), op.k()),
-            0x7 => AddK(op.x(), op.k()),
+            0x1 => Jump(raw.addr()),
+            0x2 => Call(raw.addr()),
+            0x3 => SkipEqualK(raw.x(), raw.k()),
+            0x4 => SkipNotEqualK(raw.x(), raw.k()),
+            0x5 => SkipEqual(raw.x(), raw.y()),
+            0x6 => SetK(raw.x(), raw.k()),
+            0x7 => AddK(raw.x(), raw.k()),
             0x8 => {
-                match op.n_low() {
-                    0x0 => Set(op.x(), op.y()),
-                    0x1 => Or(op.x(), op.y()),
-                    0x2 => And(op.x(), op.y()),
-                    0x3 => XOr(op.x(), op.y()),
-                    0x4 => Add(op.x(), op.y()),
-                    0x5 => Sub(op.x(), op.y()),
-                    0x6 => ShiftRight(op.x(), op.y()),
-                    0x7 => SubInv(op.x(), op.y()),
-                    0xE => ShiftLeft(op.x(), op.y()),
+                match raw.n_low() {
+                    0x0 => Set(raw.x(), raw.y()),
+                    0x1 => Or(raw.x(), raw.y()),
+                    0x2 => And(raw.x(), raw.y()),
+                    0x3 => XOr(raw.x(), raw.y()),
+                    0x4 => Add(raw.x(), raw.y()),
+                    0x5 => Sub(raw.x(), raw.y()),
+                    0x6 => ShiftRight(raw.x(), raw.y()),
+                    0x7 => SubInv(raw.x(), raw.y()),
+                    0xE => ShiftLeft(raw.x(), raw.y()),
                     _ => Unknown
                 }
             },
-            0x9 => SkipNotEqual(op.x(), op.y()),
-            0xA => LoadI(op.addr()),
-            0xB => LongJump(op.addr()),
-            0xC => Rand(op.x(), op.k()),
-            0xD => Draw(op.x(), op.y(), op.n_low()),
+            0x9 => SkipNotEqual(raw.x(), raw.y()),
+            0xA => LoadI(raw.addr()),
+            0xB => LongJump(raw.addr()),
+            0xC => Rand(raw.x(), raw.k()),
+            0xD => Draw(raw.x(), raw.y(), raw.n_low()),
             0xE => {
-                match op.k() {
-                    0x9E => SkipPressed(op.x()),
-                    0xA1 => SkipNotPressed(op.x()),
+                match raw.k() {
+                    0x9E => SkipPressed(raw.x()),
+                    0xA1 => SkipNotPressed(raw.x()),
                     _ => Unknown,
                 }
             },
             0xF => {
-                match op.k() {
-                    0x07 => GetTimer(op.x()),
-                    0x0A => WaitKey(op.x()),
-                    0x15 => SetTimer(op.x()),
-                    0x18 => SetSoundTimer(op.x()),
-                    0x1E => AddToI(op.x()),
-                    0x29 => LoadHexGlyph(op.x()),
-                    0x33 => StoreBCD(op.x()),
-                    0x55 => StoreRegisters(op.x()),
-                    0x65 => LoadRegisters(op.x()),
+                match raw.k() {
+                    0x07 => GetTimer(raw.x()),
+                    0x0A => WaitKey(raw.x()),
+                    0x15 => SetTimer(raw.x()),
+                    0x18 => SetSoundTimer(raw.x()),
+                    0x1E => AddToI(raw.x()),
+                    0x29 => LoadHexGlyph(raw.x()),
+                    0x33 => StoreBCD(raw.x()),
+                    0x55 => StoreRegisters(raw.x()),
+                    0x65 => LoadRegisters(raw.x()),
                     _ => Unknown,
                 }
             }

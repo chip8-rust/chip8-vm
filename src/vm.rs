@@ -5,7 +5,7 @@ extern crate rand;
 use std::old_io::{BufWriter, Reader};
 // use std::num::Float;
 use error::Chip8Error;
-use ops::{Op, Instruction};
+use instructions::{RawInstruction, Instruction};
 use std::slice::Chunks;
 
 use rand::Rng;
@@ -123,9 +123,11 @@ impl Vm {
     }
 
     fn exec(&mut self, ins: &Instruction) -> bool {
-        use ops::Instruction::*;
+        use instructions::Instruction::*;
+
         match *ins {
             // Sys(addr) intentionally left unimplemented.
+
             Clear => {
                 for b in self.screen.iter_mut() {
                     *b = 0;
@@ -359,9 +361,9 @@ impl Vm {
                 let codes = &self.ram[self.pc..self.pc+2];
                 ((codes[0] as u16) << 8) | codes[1] as u16
             };
-            let op = Op::new(raw);
+            let raw_ins = RawInstruction::new(raw);
             self.pc += 2;
-            self.exec(&Instruction::from_op(&op));
+            self.exec(&Instruction::from_raw(&raw_ins));
         }
     }
 
@@ -388,15 +390,15 @@ impl Vm {
             match i {
                 [0, 0] => continue,
                 [h, l] => {
-                    let op = Op::new(((h as u16) << 8) | l as u16);
-                    println!("raw: 0x{:X}", op.raw());
-                    println!("instruction: {:?}", Instruction::from_op(&op));
-                    println!("addr: 0x{:X}", op.addr());
-                    println!("x: 0x{:X}", op.x());
-                    println!("y: 0x{:X}", op.y());
-                    println!("n_high: 0x{:X}", op.n_high());
-                    println!("n_low: 0x{:X}", op.n_low());
-                    println!("k: 0x{:X}\n", op.k());
+                    let raw_ins = RawInstruction::new(((h as u16) << 8) | l as u16);
+                    println!("raw bits: 0x{:X}", raw_ins.bits());
+                    println!("instruction: {:?}", Instruction::from_raw(&raw_ins));
+                    println!("addr: 0x{:X}", raw_ins.addr());
+                    println!("x: 0x{:X}", raw_ins.x());
+                    println!("y: 0x{:X}", raw_ins.y());
+                    println!("n_high: 0x{:X}", raw_ins.n_high());
+                    println!("n_low: 0x{:X}", raw_ins.n_low());
+                    println!("k: 0x{:X}\n", raw_ins.k());
                 },
                 _ => continue
             }

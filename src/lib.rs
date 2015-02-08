@@ -6,8 +6,9 @@
 //! and so on.
 //!
 //!
-//! The code is split into the `ops` module, which provides
-//! the translation from opcodes (`Op`) into instructions (`Instruction`).
+//! The code is split into the `instructions` module, which provides
+//! the translation from raw bits (`RawInstruction`) into valid
+//! instructions (`Instruction`).
 //!
 //! The `vm` module contains the actual virtual machine implementation
 //! (`Vm`) and a few shared constants.
@@ -26,5 +27,7 @@
 extern crate rand;
 
 pub mod error;
-pub mod ops;
+pub mod instructions;
 pub mod vm;
+
+pub use instructions::*;

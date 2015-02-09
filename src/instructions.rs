@@ -45,12 +45,12 @@ impl RawInstruction {
         self.bits & 0x0FFF
     }
 
-    /// The *index of the `Vx` register* part
+    /// The *`Vx` register-index* part, i.e. `0xE` is `VE`
     pub fn x(&self) -> Vx {
         ((self.bits & 0x0F00) >> 8) as u8
     }
 
-    /// The *index of the `Vy` register* part
+    /// The *`Vy` register-index* part, i.e. `0xE` is `VE`
     pub fn y(&self) -> Vy {
         ((self.bits & 0x00F0) >> 4) as u8
     }

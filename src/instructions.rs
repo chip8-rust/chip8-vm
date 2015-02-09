@@ -6,18 +6,40 @@
 pub type Vx = u8;
 /// Second register in an opcode
 pub type Vy = u8;
-/// Absolute memory address
-///
-/// Valid addresses are within `0x0` .. `0xFFF`.
-pub type Addr = u16;
 /// A byte
 ///
 /// Valid values are within `0x0` .. `0xFF`.
 pub type Byte = u8;
+
 /// A nibble (hex digit)
 ///
 /// Valid values are within `0x0` .. `0xF`.
-pub type Nibble = u8;
+#[derive(Copy, Debug)]
+pub struct Nibble {
+    pub bits: u8,
+}
+
+impl Nibble {
+    /// Creates a new `Nibble`, ignoring any high bits
+    pub fn new(bits: u8) -> Nibble {
+        Nibble { bits: bits & 0x0F }
+    }
+}
+
+/// Absolute memory address
+///
+/// Valid addresses are within `0x0` .. `0xFFF`.
+#[derive(Copy, Debug)]
+pub struct Addr {
+    pub bits: u16,
+}
+
+impl Addr {
+    /// Creates a new `Addr`, ignoring any high bits
+    pub fn new(bits: u16) -> Addr {
+        Addr { bits: bits & 0x0FFF }
+    }
+}
 
 
 /// Raw instruction
@@ -42,7 +64,7 @@ impl RawInstruction {
 
     /// The *address bits* part
     pub fn addr(&self) -> Addr {
-        self.bits & 0x0FFF
+        Addr::new(self.bits & 0x0FFF)
     }
 
     /// The *`Vx` register-index* part, i.e. `0xE` is `VE`
@@ -57,12 +79,12 @@ impl RawInstruction {
 
     /// The *high nibble* part
     pub fn n_high(&self) -> Nibble {
-        ((self.bits & 0xF000) >> 12) as u8
+        Nibble::new(((self.bits & 0xF000) >> 12) as u8)
     }
 
     /// The *low nibble* part
     pub fn n_low(&self) -> Nibble {
-        (self.bits & 0x000F) as u8
+        Nibble::new((self.bits & 0x000F) as u8)
     }
 
     /// The *`k` byte* part
@@ -120,7 +142,7 @@ impl Instruction {
     pub fn from_raw(raw: &RawInstruction) -> Instruction {
         use self::Instruction::*;
 
-        match raw.n_high() {
+        match raw.n_high().bits {
             0x0 => {
                 match raw.k() {
                     0xE0 => Clear,
@@ -136,7 +158,7 @@ impl Instruction {
             0x6 => SetK(raw.x(), raw.k()),
             0x7 => AddK(raw.x(), raw.k()),
             0x8 => {
-                match raw.n_low() {
+                match raw.n_low().bits {
                     0x0 => Set(raw.x(), raw.y()),
                     0x1 => Or(raw.x(), raw.y()),
                     0x2 => And(raw.x(), raw.y()),

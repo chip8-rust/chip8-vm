@@ -138,14 +138,14 @@ impl Vm {
                 self.sp-=1;
             },
             Jump(addr) => {
-                let idle = self.pc-2 == addr as usize;
-                self.pc = addr as usize;
+                let idle = self.pc-2 == addr.bits as usize;
+                self.pc = addr.bits as usize;
                 if idle { return true; }
             }
             Call(addr) => {
                 self.sp+=1;
                 self.stack[self.sp] = self.pc;
-                self.pc = addr as usize;
+                self.pc = addr.bits as usize;
             },
             SkipEqualK(vx, k) => {
                 if self.reg[vx as usize] == k {
@@ -226,10 +226,10 @@ impl Vm {
                 }
             },
             LoadI(addr) => {
-                self.i = addr as usize;
+                self.i = addr.bits as usize;
             },
             LongJump(addr) => {
-                self.pc = (self.reg[0] as u16 + addr) as usize;
+                self.pc = (self.reg[0] as u16 + addr.bits) as usize;
             },
             Rand(vx, byte) => {
                 self.reg[vx as usize] = rand::thread_rng().gen::<u8>() & byte;
@@ -238,7 +238,7 @@ impl Vm {
                 let x = self.reg[vx as usize] as usize;
                 let y = self.reg[vy as usize] as usize;
                 let i = self.i as usize;
-                let n = n as usize;
+                let n = n.bits as usize;
 
                 let sprite = &self.ram[i..i+n];
 
@@ -393,11 +393,11 @@ impl Vm {
                     let raw_ins = RawInstruction::new(((h as u16) << 8) | l as u16);
                     println!("raw bits: 0x{:X}", raw_ins.bits());
                     println!("instruction: {:?}", Instruction::from_raw(&raw_ins));
-                    println!("addr: 0x{:X}", raw_ins.addr());
+                    println!("addr: 0x{:X}", raw_ins.addr().bits);
                     println!("x: 0x{:X}", raw_ins.x());
                     println!("y: 0x{:X}", raw_ins.y());
-                    println!("n_high: 0x{:X}", raw_ins.n_high());
-                    println!("n_low: 0x{:X}", raw_ins.n_low());
+                    println!("n_high: 0x{:X}", raw_ins.n_high().bits);
+                    println!("n_low: 0x{:X}", raw_ins.n_low().bits);
                     println!("k: 0x{:X}\n", raw_ins.k());
                 },
                 _ => continue

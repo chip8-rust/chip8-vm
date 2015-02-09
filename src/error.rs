@@ -1,13 +1,13 @@
 //! `std:error:Error` implementations
 
 use std::fmt;
-use std::old_io::{IoError};
+use std::io;
 use std::error::{Error, FromError};
 
 /// `Error` variants for public errors in this crate
 pub enum Chip8Error {
     /// I/O error
-    Io(&'static str, Option<IoError>),
+    Io(&'static str, Option<io::Error>),
 }
 
 impl fmt::Display for Chip8Error {
@@ -31,8 +31,8 @@ impl Error for Chip8Error {
     }
 }
 
-impl FromError<IoError> for Chip8Error {
-    fn from_error(err: IoError) -> Chip8Error {
+impl FromError<io::Error> for Chip8Error {
+    fn from_error(err: io::Error) -> Chip8Error {
         Chip8Error::Io("Internal IO error: ", Some(err))
     }
 }

@@ -3,8 +3,8 @@
 extern crate rand;
 
 use std::old_io::{BufWriter, Reader};
-// use std::num::Float;
 use error::Chip8Error;
+use instructions::Register;
 use instructions::{RawInstruction, Instruction};
 use std::slice::Chunks;
 
@@ -60,7 +60,7 @@ pub struct Vm {
 
     screen: [u8; 64 * 32],
     keys: [u8; 16],
-    waiting_on_key: Option<u8>,
+    waiting_on_key: Option<Register>,
 }
 
 impl Vm {
@@ -180,7 +180,7 @@ impl Vm {
                 let res = x + y;
 
                 // VF is carryover
-                self.reg[15] = (res > 255) as u8;
+                self.reg[Register::VF as usize] = (res > 255) as u8;
 
                 self.reg[vx as usize] = res as u8;
             },
@@ -189,7 +189,7 @@ impl Vm {
                 let y = self.reg[vy as usize];
 
                 // VF is Not Borrow i.e. x > y
-                self.reg[15] = (x > y) as u8;
+                self.reg[Register::VF as usize] = (x > y) as u8;
 
                 self.reg[vx as usize] = x - y;
             },
@@ -197,7 +197,7 @@ impl Vm {
                 let y = self.reg[vy as usize];
 
                 // VF is lsb before shift
-                self.reg[15] = 0x1 & y;
+                self.reg[Register::VF as usize] = 0x1 & y;
 
                 self.reg[vx as usize] = y >> 1;
             },
@@ -206,7 +206,7 @@ impl Vm {
                 let y = self.reg[vy as usize];
 
                 // VF is Not Borrow i.e. y > x
-                self.reg[15] = (y > x) as u8;
+                self.reg[Register::VF as usize] = (y > x) as u8;
 
                 self.reg[vx as usize] = y - x;
             },
@@ -214,7 +214,7 @@ impl Vm {
                 let y = self.reg[vy as usize];
 
                 // VF is msb before shift
-                self.reg[15] = y >> 7;
+                self.reg[Register::VF as usize] = y >> 7;
 
                 self.reg[vx as usize] = y << 1;
             }
@@ -242,7 +242,7 @@ impl Vm {
 
                 let sprite = &self.ram[i..i+n];
 
-                self.reg[15] = 0;
+                self.reg[Register::VF as usize] = 0;
                 for (sy, byte) in sprite.iter().enumerate() {
                     let dy = (y + sy) % 32;
                     for sx in 0us..8 {
@@ -252,7 +252,7 @@ impl Vm {
                         self.screen[idx] ^= px;
 
                         // Vf is if there was a collision
-                        self.reg[15] |= (self.screen[idx] == 0 && px == 1) as u8;
+                        self.reg[Register::VF as usize] |= (self.screen[idx] == 0 && px == 1) as u8;
                     }
                 }
             },
@@ -394,8 +394,8 @@ impl Vm {
                     println!("raw bits: 0x{:X}", raw_ins.bits());
                     println!("instruction: {:?}", Instruction::from_raw(&raw_ins));
                     println!("addr: 0x{:X}", raw_ins.addr().bits);
-                    println!("x: 0x{:X}", raw_ins.x());
-                    println!("y: 0x{:X}", raw_ins.y());
+                    println!("x: 0x{:X}", raw_ins.x() as u8);
+                    println!("y: 0x{:X}", raw_ins.y() as u8);
                     println!("n_high: 0x{:X}", raw_ins.n_high().bits);
                     println!("n_low: 0x{:X}", raw_ins.n_low().bits);
                     println!("k: 0x{:X}\n", raw_ins.k());
@@ -410,6 +410,7 @@ impl Vm {
 mod tests {
     use super::*;
     use instructions::*;
+    use instructions::Register::*;
 
     macro_rules! reg_test {
         (
@@ -426,14 +427,13 @@ mod tests {
             fn $name() {
                 let mut vm = Vm::new();
                 $(
-                    vm.reg[$reg_before] = $reg_before_val;
+                    vm.reg[$reg_before as usize] = $reg_before_val;
                 )+
                 vm.exec(&$ins);
                 $(
-                    assert!(vm.reg[$reg_after] == $reg_after_val);
+                    assert!(vm.reg[$reg_after as usize] == $reg_after_val);
                 )+
-                let overflow = 15;
-                assert!(vm.reg[overflow] == $over, "overflow was {}, wanted {}", vm.reg[overflow], $over);
+                assert!(vm.reg[VF as usize] == $over, "overflow was {}, wanted {}", vm.reg[VF as usize], $over);
             }
         )
     }
@@ -441,119 +441,119 @@ mod tests {
     // Add
     reg_test!(
         add_vx {
-        before: { 2 => 0xFE, 3 => 0x01 },
-        after: { 2 => 0xFF, 3 => 0x01 },
+        before: { V2 => 0xFE, V3 => 0x01 },
+        after: { V2 => 0xFF, V3 => 0x01 },
         overflow: 0,
-        ins: Instruction::Add(2,3)
+        ins: Instruction::Add(V2, V3)
     });
 
     reg_test!(
         add_vx_overflows {
-        before: { 2 => 0xFF, 3 => 0x01 },
-        after: { 2 => 0x00, 3 => 0x01 },
+        before: { V2 => 0xFF, V3 => 0x01 },
+        after: { V2 => 0x00, V3 => 0x01 },
         overflow: 1,
-        ins: Instruction::Add(2,3)
+        ins: Instruction::Add(V2, V3)
     });
 
     // AddK
     reg_test!(
         add_k {
-        before: { 0 => 0x09 },
-        after: { 0 => 0x0B },
+        before: { V0 => 0x09 },
+        after: { V0 => 0x0B },
         overflow: 0,
-        ins: Instruction::AddK(0,2)
+        ins: Instruction::AddK(V0, 2)
     });
 
     reg_test!(
         add_k_overflows {
-        before: { 0 => 0xFF },
-        after: { 0 => 0x01 },
+        before: { V0 => 0xFF },
+        after: { V0 => 0x01 },
         overflow: 0, // Un-intuitive but not spec'd to set overflow
-        ins: Instruction::AddK(0,2)
+        ins: Instruction::AddK(V0, 2)
     });
 
     // Sub
     reg_test!(
         sub {
-        before: { 0 => 0x3, 1 => 0x2 },
-        after:  { 0 => 0x1, 1 => 0x2 },
+        before: { V0 => 0x3, V1 => 0x2 },
+        after:  { V0 => 0x1, V1 => 0x2 },
         overflow: 1, // Defined as not-borrowed
-        ins: Instruction::Sub(0,1)
+        ins: Instruction::Sub(V0, V1)
     });
 
     reg_test!(
         sub_borrow {
-        before: { 0 => 0x3, 1 => 0x5 },
-        after:  { 0 => 0xFE, 1 => 0x5 },
+        before: { V0 => 0x3, V1 => 0x5 },
+        after:  { V0 => 0xFE, V1 => 0x5 },
         overflow: 0, // Defined as not-borrowed
-        ins: Instruction::Sub(0,1)
+        ins: Instruction::Sub(V0, V1)
     });
 
     // SubInv
     reg_test!(
         sub_inv {
-        before: { 0 => 0x2, 1 => 0x3 },
-        after:  { 0 => 0x1, 1 => 0x3 },
+        before: { V0 => 0x2, V1 => 0x3 },
+        after:  { V0 => 0x1, V1 => 0x3 },
         overflow: 1, // Defined as not-borrowed
-        ins: Instruction::SubInv(0,1)
+        ins: Instruction::SubInv(V0, V1)
     });
 
     reg_test!(
         sub_inv_borrow {
-        before: { 0 => 0x5, 1 => 0x3 },
-        after:  { 0 => 0xFE, 1 => 0x3 },
+        before: { V0 => 0x5, V1 => 0x3 },
+        after:  { V0 => 0xFE, V1 => 0x3 },
         overflow: 0, // Defined as not-borrowed
-        ins: Instruction::SubInv(0,1)
+        ins: Instruction::SubInv(V0, V1)
     });
 
     // ShiftLeft
     reg_test!(
         shiftl_vx_vy {
-        before: { 2 => 0xBB, 3 => 0x02 },
-        after:  { 2 => 0x04, 3 => 0x02 },
+        before: { V2 => 0xBB, V3 => 0x02 },
+        after:  { V2 => 0x04, V3 => 0x02 },
         overflow: 0,
-        ins: Instruction::ShiftLeft(2,3)
+        ins: Instruction::ShiftLeft(V2, V3)
     });
 
     reg_test!(
         shiftl_vx_inplace {
-        before: { 2 => 0b0111_0111 },
-        after:  { 2 => 0b1110_1110 },
+        before: { V2 => 0b0111_0111 },
+        after:  { V2 => 0b1110_1110 },
         overflow: 0,
-        ins: Instruction::ShiftLeft(2,2)
+        ins: Instruction::ShiftLeft(V2, V2)
     });
 
     reg_test!(
         shiftl_vx_inplace_overflow {
-        before: { 2 => 0b1111_1111 },
-        after:  { 2 => 0b1111_1110 },
+        before: { V2 => 0b1111_1111 },
+        after:  { V2 => 0b1111_1110 },
         overflow: 1,
-        ins: Instruction::ShiftLeft(2,2)
+        ins: Instruction::ShiftLeft(V2, V2)
     });
 
     // ShiftRight
     reg_test!(
         shiftr_vx_vy {
-        before: { 2 => 0xBB, 3 => 0x04 },
-        after:  { 2 => 0x02, 3 => 0x04 },
+        before: { V2 => 0xBB, V3 => 0x04 },
+        after:  { V2 => 0x02, V3 => 0x04 },
         overflow: 0,
-        ins: Instruction::ShiftRight(2,3)
+        ins: Instruction::ShiftRight(V2, V3)
     });
 
     reg_test!(
         shiftr_vx_inplace {
-        before: { 2 => 0b1110_1110 },
-        after:  { 2 => 0b0111_0111 },
+        before: { V2 => 0b1110_1110 },
+        after:  { V2 => 0b0111_0111 },
         overflow: 0,
-        ins: Instruction::ShiftRight(2,2)
+        ins: Instruction::ShiftRight(V2, V2)
     });
 
     reg_test!(
         shiftr_vx_inplace_overflow {
-        before: { 2 => 0b1111_1111 },
-        after:  { 2 => 0b0111_1111 },
+        before: { V2 => 0b1111_1111 },
+        after:  { V2 => 0b0111_1111 },
         overflow: 1,
-        ins: Instruction::ShiftRight(2,2)
+        ins: Instruction::ShiftRight(V2, V2)
     });
 
     #[test]

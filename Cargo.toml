@@ -5,9 +5,9 @@ description = "Virtual machine for the CHIP-8 programming language"
 readme = "../README.md"
 license = "MIT"
 keywords = ["vm", "chip-8",]
-homepage = "https://github.com/chip8-rust/chip8-rust"
-repository = "https://github.com/chip8-rust/chip8-rust.git"
-documentation = "https://chip8-rust.github.io/chip8-rust/chip8_vm/"
+homepage = "https://github.com/chip8-rust/chip8-vm"
+repository = "https://github.com/chip8-rust/chip8-vm.git"
+documentation = "https://chip8-rust.github.io/chip8-vm/chip8_vm/"
 version = "0.0.2"
 authors = [
     "Jake Kerr <kodafox@gmail.com>",

@@ -1,0 +1,15 @@
+env:
+  global:
+    secure: qFrFEjQ8N1w7qKsTi6hpwSl2VtjKJiIlvvwiAgvzZkiu/DlFZH+33cQcWVpIA0PofUQF94s+lTg4Y1dVMh4cbGOCA2mu1RaULPaGVGx1j4rRKaMg7GS1E3IthPfp0e6iYzHtFAFF+YK7JGkwk9kVNHWb3Wer7ES3Z3YOrFoE5hc=
+language: rust
+script:
+  - cargo build --verbose
+  - cargo test --verbose
+  - cargo doc --verbose
+after_success: |
+  [ $TRAVIS_BRANCH = master ] &&
+  [ $TRAVIS_PULL_REQUEST = false ] &&
+  sudo -H pip install --upgrade pip &&
+  sudo -H pip install ghp-import &&
+  ghp-import -n target/doc &&
+  git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages

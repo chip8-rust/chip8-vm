@@ -14,6 +14,7 @@ script:
 after_success: |
   [ $TRAVIS_BRANCH = master ] &&
   [ $TRAVIS_PULL_REQUEST = false ] &&
+  echo '<meta http-equiv=refresh content=0;url=chip8_vm/index.html>' > target/doc/index.html &&
   sudo -H pip install --upgrade pip &&
   sudo -H pip install ghp-import &&
   ghp-import -n target/doc &&

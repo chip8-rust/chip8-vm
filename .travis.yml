@@ -1,11 +1,16 @@
 env:
   global:
-    secure: qFrFEjQ8N1w7qKsTi6hpwSl2VtjKJiIlvvwiAgvzZkiu/DlFZH+33cQcWVpIA0PofUQF94s+lTg4Y1dVMh4cbGOCA2mu1RaULPaGVGx1j4rRKaMg7GS1E3IthPfp0e6iYzHtFAFF+YK7JGkwk9kVNHWb3Wer7ES3Z3YOrFoE5hc=
+  # GH_TOKEN is an oauth token with repo scope.
+  # It must be encrypted using the travis gem
+  # http://about.travis-ci.org/docs/user/build-configuration/#Secure-environment-variables
+  #
+  # travis encrypt GH_TOKEN=XXXXXXXXXXXXXXX
+  - secure: e8Ztz6KX7YYwyAfss/ciLAxSl0dLCT/Hysh4xwrB0LrtPFwlL6MIyu2bh4Hn2Fuw/xhlbOZ+7xHnHqkbr2QK9IJXyBAg9RHSnxBE20eZoXv9aIhAFcoln9RlUiOKGsk2SDVq+Gtn8/A3zYEZfzLC3Zp2wmYTXdCQXPjqY0ahLDg=
 language: rust
 script:
-  - cargo build --verbose
-  - cargo test --verbose
-  - cargo doc --verbose
+- cargo build --verbose
+- cargo test --verbose
+- cargo doc --verbose
 after_success: |
   [ $TRAVIS_BRANCH = master ] &&
   [ $TRAVIS_PULL_REQUEST = false ] &&

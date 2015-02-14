@@ -5,6 +5,7 @@ can be used as the back end for CHIP-8 emulator projects / debuggers etc.
 
 Status
 ==
+[![Build Status](https://travis-ci.org/chip8-rust/chip8-vm.svg?branch=master)](https://travis-ci.org/chip8-rust/chip8-vm)
 * All 35 original Chip-8 instructions are implemented.
 
 Usage

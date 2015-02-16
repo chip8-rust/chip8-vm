@@ -5,7 +5,7 @@ can be used as the back end for CHIP-8 emulator projects / debuggers etc.
 
 Status
 ==
-[![Build Status](https://travis-ci.org/chip8-rust/chip8-vm.svg?branch=master)](https://travis-ci.org/chip8-rust/chip8-vm) [![Build status](https://ci.appveyor.com/api/projects/status/4j05j1xokuc8m8pv/branch/master?svg=true)](https://ci.appveyor.com/project/robo9k/chip8-vm/branch/master)
+[![travis-badge][]][travis] [![appveyor-badge][]][appveyor]
 * All 35 original Chip-8 instructions are implemented.
 
 Usage
@@ -41,3 +41,8 @@ They were both incredibly helpful. Our thanks to the authors!
 Licence
 ==
 MIT
+
+[travis-badge]: https://img.shields.io/travis/chip8-rust/chip8-vm/master.svg?label=linux%20build
+[travis]: https://travis-ci.org/chip8-rust/chip8-vm
+[appveyor-badge]: https://img.shields.io/appveyor/ci/robo9k/chip8-vm/master.svg?label=windows%20build
+[appveyor]: https://ci.appveyor.com/project/robo9k/chip8-vm/branch/master

@@ -245,7 +245,7 @@ impl Vm {
                 self.reg[Register::VF as usize] = 0;
                 for (sy, byte) in sprite.iter().enumerate() {
                     let dy = (y + sy) % 32;
-                    for sx in 0us..8 {
+                    for sx in 0usize..8 {
                         let px = (*byte >> (7 - sx)) & 0b00000001;
                         let dx = (x + sx) % 64;
                         let idx = dy * 64 + dx;
@@ -293,7 +293,7 @@ impl Vm {
                 let mut x = self.reg[vx as usize];
 
                 let mut place = 100;
-                for i in 0us..3 {
+                for i in 0usize..3 {
                     let bcd = x / place;
                     self.ram[self.i + i] = bcd;
                     x -= bcd * place;

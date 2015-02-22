@@ -7,7 +7,7 @@ license = "MIT"
 keywords = ["vm", "chip-8",]
 homepage = "https://github.com/chip8-rust/chip8-vm"
 repository = "https://github.com/chip8-rust/chip8-vm.git"
-documentation = "https://chip8-rust.github.io/chip8-vm/chip8_vm/"
+documentation = "https://chip8-rust.github.io/chip8-vm/"
 version = "0.0.3"
 authors = [
     "Jake Kerr <kodafox@gmail.com>",

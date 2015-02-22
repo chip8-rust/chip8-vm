@@ -7,3 +7,15 @@ script:
   - cargo test --verbose
 after_success:
   - test "${TRAVIS_PULL_REQUEST}" == 'false' && test "${TRAVIS_BRANCH}" == 'master' && bash ./ci/upload-rustdoc.sh "${TRAVIS_REPO_SLUG}" "${GH_TOKEN}"
+before_deploy:
+  - cargo package --verbose
+deploy:
+  provider: releases
+  api_key:
+    secure: Ob6q8i92zrpOZAviTANg49iZDA3e5k7e5w5vj7f+RUSr2E/EX36cluqQTDl9P5MLfFGhMLMOo01TXdAJlw+CpYR79piparqkQ77gpNjWi1CpBykS/esTIF9GEO5hGu1ZMNYgotFm00WlHt1RGdUKwR0r1PLfzlKgh/c97vbsKY4=
+  file_glob: true
+  file: target/package/chip8_vm-*.crate
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: chip8-rust/chip8-vm

@@ -2,7 +2,7 @@
 
 extern crate rand;
 
-use std::old_io::{BufWriter, Reader};
+use std::io::{Read, Write, BufWriter};
 use error::Chip8Error;
 use instructions::Register;
 use instructions::{RawInstruction, Instruction};
@@ -90,8 +90,9 @@ impl Vm {
         vm
     }
 
-    pub fn load_rom(&mut self, reader: &mut Reader) -> Result<usize, Chip8Error> {
-        let rom = try!(reader.read_to_end());
+    pub fn load_rom(&mut self, reader: &mut Read) -> Result<usize, Chip8Error> {
+        let mut rom = Vec::new();
+        try!(reader.read_to_end(&mut rom));
         if rom.len() > (RAM_SIZE - PROGRAM_START) {
             println!("Rom size {}", rom.len());
             return Err(Chip8Error::Io("ROM was larger than available RAM", None))
@@ -102,7 +103,7 @@ impl Vm {
     }
 
     #[allow(dead_code)]
-    pub fn dump_ram(&self, writer: &mut Writer) {
+    pub fn dump_ram(&self, writer: &mut Write) {
         writer.write_all(&self.ram).unwrap();
     }
 
@@ -558,12 +559,11 @@ mod tests {
 
     #[test]
     fn oversized_rom() {
-        use std::old_io::MemReader;
+        use std::io::Cursor;
 
         let mut vm = Vm::new();
-        let rom_size = super::RAM_SIZE + 1;
-        let rom: Vec<u8> = (0..rom_size).map(|_| 0).collect();
+        let rom = vec![0; super::RAM_SIZE + 1];
 
-        assert!(vm.load_rom(&mut MemReader::new(rom)).is_err());
+        assert!(vm.load_rom(&mut Cursor::new(rom)).is_err());
     }
 }

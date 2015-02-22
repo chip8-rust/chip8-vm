@@ -17,6 +17,8 @@ echo '<meta http-equiv=refresh content=0;url=chip8_vm/index.html>' > index.html
 
 # Overwrite gh-pages branch with rustdoc
 git init
+git config 'user.name' 'Travis CI'
+git config 'user.email' 'chip8-rust@users.noreply.github.com'
 git add --all .
 git commit --message='Update documentation'
 git push --quiet --force "https://${GITHUB_TOKEN}@github.com/${GITHUB_REPO_SLUG}.git" master:gh-pages

@@ -1,21 +1,9 @@
 env:
   global:
-  # GH_TOKEN is an oauth token with repo scope.
-  # It must be encrypted using the travis gem
-  # http://about.travis-ci.org/docs/user/build-configuration/#Secure-environment-variables
-  #
-  # travis encrypt GH_TOKEN=XXXXXXXXXXXXXXX
-  - secure: e8Ztz6KX7YYwyAfss/ciLAxSl0dLCT/Hysh4xwrB0LrtPFwlL6MIyu2bh4Hn2Fuw/xhlbOZ+7xHnHqkbr2QK9IJXyBAg9RHSnxBE20eZoXv9aIhAFcoln9RlUiOKGsk2SDVq+Gtn8/A3zYEZfzLC3Zp2wmYTXdCQXPjqY0ahLDg=
+    secure: NGqueWme7FGume4ZGrggdLhf1SIkbjni6BphEI0wkXPGYYD+CAQ36/XqadfI1OhJ3ZJgdqcFABJMntdzyGSI3z1SoWc7xgzMEHeW0QusOVBwJMWgMvh/DzXvp8nTG2BmVIhqzqyWVBCqzMARLNh3NnYaJFGnN2uXyXBSBh+K6ps=
 language: rust
 script:
-- cargo build --verbose
-- cargo test --verbose
-- cargo doc --verbose
-after_success: |
-  [ $TRAVIS_BRANCH = master ] &&
-  [ $TRAVIS_PULL_REQUEST = false ] &&
-  echo '<meta http-equiv=refresh content=0;url=chip8_vm/index.html>' > target/doc/index.html &&
-  sudo -H pip install --upgrade pip &&
-  sudo -H pip install ghp-import &&
-  ghp-import -n target/doc &&
-  git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
+  - cargo build --verbose
+  - cargo test --verbose
+after_success:
+  - test "${TRAVIS_PULL_REQUEST}" == 'false' && test "${TRAVIS_BRANCH}" == 'master' && bash ./ci/upload-rustdoc.sh "${TRAVIS_REPO_SLUG}" "${GH_TOKEN}"

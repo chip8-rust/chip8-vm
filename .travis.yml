@@ -1,6 +1,7 @@
 env:
   global:
-    secure: NGqueWme7FGume4ZGrggdLhf1SIkbjni6BphEI0wkXPGYYD+CAQ36/XqadfI1OhJ3ZJgdqcFABJMntdzyGSI3z1SoWc7xgzMEHeW0QusOVBwJMWgMvh/DzXvp8nTG2BmVIhqzqyWVBCqzMARLNh3NnYaJFGnN2uXyXBSBh+K6ps=
+    - secure: NGqueWme7FGume4ZGrggdLhf1SIkbjni6BphEI0wkXPGYYD+CAQ36/XqadfI1OhJ3ZJgdqcFABJMntdzyGSI3z1SoWc7xgzMEHeW0QusOVBwJMWgMvh/DzXvp8nTG2BmVIhqzqyWVBCqzMARLNh3NnYaJFGnN2uXyXBSBh+K6ps=
+    - secure: eh16T+EPdEtelIDMBCj5hiZucybVNRQaZP475KhKRC75UnH4i0163LTcOyaUa4mhVFk8hTGMkBKrLMtW1Bz9AGuOrpUehgRohe1nj93nl1aZZZzuOzV4vwoewkUz2MWjZ+tGXp3oRG0qRNETWxvkZHsJvXf83qylj4+ywAX15d0=
 language: rust
 script:
   - cargo build --verbose
@@ -19,3 +20,5 @@ deploy:
   on:
     tags: true
     repo: chip8-rust/chip8-vm
+after_deploy:
+  - cargo publish --verbose --token "${CRATESIO_TOKEN}"

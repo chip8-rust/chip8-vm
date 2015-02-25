@@ -1,9 +1,21 @@
+branches:
+  except:
+    - gh-pages
+
+platform:
+  - x86
+environment:
+  matrix:
+    - RUST_INSTALL_TRIPLE: i686-pc-windows-gnu
+      RUST_INSTALL_DIR: C:\Program Files (x86)\Rust
+
 install:
-- ps: Start-FileDownload 'https://static.rust-lang.org/dist/rust-nightly-i686-pc-windows-gnu.exe'
-- rust-nightly-i686-pc-windows-gnu.exe /VERYSILENT /NORESTART /COMPONENTS="rust,gcc,cargo" /DIR="C:\Program Files (x86)\Rust"
-- cmd: SET PATH=%PATH%;C:\Program Files (x86)\Rust\bin
-- rustc --version
-- cargo --version
+  - ps: Start-FileDownload "https://static.rust-lang.org/dist/rust-nightly-$Env:RUST_INSTALL_TRIPLE.exe"
+  - rust-nightly-i686-pc-windows-gnu.exe /VERYSILENT /NORESTART /COMPONENTS="rust,gcc,cargo" /DIR="%RUST_INSTALL_DIR%"
+  - cmd: SET PATH=%PATH%;%RUST_INSTALL_DIR%\bin
+  - rustc --version
+  - cargo --version
+
 build: false
 test_script:
   - cargo build --verbose

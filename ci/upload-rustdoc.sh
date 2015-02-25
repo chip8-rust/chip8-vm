@@ -7,7 +7,7 @@ GITHUB_TOKEN=${2:?'Must provide GitHub access token'}
 
 
 # Build docs with default options for current directory
-cargo doc --verbose
+cargo doc --no-deps --verbose
 
 # Reuse Cargo's build directory instead of creating a temporary one
 pushd target/doc/

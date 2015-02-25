@@ -3,7 +3,6 @@ branches:
     - gh-pages
 
 platform:
-  - x86
   - x64
 environment:
   RUST_INSTALL_DIR: C:\Rust

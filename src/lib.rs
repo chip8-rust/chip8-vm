@@ -11,7 +11,7 @@
 //! instructions (`Instruction`).
 //!
 //! The `vm` module contains the actual virtual machine implementation
-//! (`Vm`) and a few shared constants.
+//! (`Vm`).
 //!
 //! The `error` module contains the `Chip8Error` implementation of
 //! `std:error::Error` for any kinds of errors that might occur using

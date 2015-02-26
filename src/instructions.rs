@@ -4,7 +4,7 @@ use std::num::{FromPrimitive, ToPrimitive};
 
 /// A register index/name
 ///
-/// There are 16 registers, `V0`..`VF`
+/// There are 16 data registers, `V0`..`VF`
 #[derive(FromPrimitive, Copy, Debug)]
 pub enum Register {
     V0 = 0x0,

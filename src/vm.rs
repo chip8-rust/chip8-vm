@@ -12,13 +12,24 @@ use rand::Rng;
 
 use std::num::Float;
 
+/// Size of the RAM in bytes
 const RAM_SIZE: usize = 4096;
+/// Depth of the stack
+const STACK_SIZE: usize = 256;
+/// Number of data registers, i.e. `V0` .. `VF`
+const NUM_DATA_REGISTERS: usize = 16;
+/// Memory address for programm (ROM) start
 const PROGRAM_START: usize = 0x200;
+/// CPU clock speed
 const CLOCK_HZ: f32 = 600.0;
 
+/// Memory address of built-in font sprites
 const FONT_ADDR: usize = 0;
+/// Number of rows in one font sprite
 const FONT_HEIGHT: usize = 5;
+/// Size of one font sprite
 const FONT_BYTES: usize = FONT_HEIGHT * 16;
+/// Data of the built-in font
 const FONT: [u8; FONT_BYTES] = [
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 	0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -37,19 +48,28 @@ const FONT: [u8; FONT_BYTES] = [
 	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
 	0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 ];
+/// Width of the screen in pixels
+const SCREEN_WIDTH: usize = 64;
+/// Height of the screen in pixels
+const SCREEN_HEIGHT: usize = 32;
+/// Total number of pixels of the screen
+const SCREEN_PIXELS: usize = SCREEN_WIDTH * SCREEN_HEIGHT;
+
+/// Number of keys on the keypad
+const NUM_KEYS: usize = 16;
 
 /// Virtual machine
 ///
-/// A virtual machine manages state like its registers,
+/// The virtual machine manages state like its registers,
 /// the RAM, stack, screen pixels, pressed keys as well as
 /// timers and some internal state.
 #[derive(Copy)]
 pub struct Vm {
-    reg: [u8; 16],
+    reg: [u8; NUM_DATA_REGISTERS],
     i: usize,
     pc: usize,
     sp: usize,
-    stack: [usize; 256],
+    stack: [usize; STACK_SIZE],
     ram: [u8; RAM_SIZE],
 
     timer: u8,
@@ -58,19 +78,19 @@ pub struct Vm {
     sound_timer: u8,
     st_tick: f32,
 
-    screen: [u8; 64 * 32],
-    keys: [u8; 16],
+    screen: [u8; SCREEN_PIXELS],
+    keys: [u8; NUM_KEYS],
     waiting_on_key: Option<Register>,
 }
 
 impl Vm {
     pub fn new() -> Vm {
         let mut vm = Vm {
-            reg: [0; 16],
+            reg: [0; NUM_DATA_REGISTERS],
             i: 0,
             pc: PROGRAM_START,
             sp: 0,
-            stack: [0; 256],
+            stack: [0; STACK_SIZE],
             ram: [0; RAM_SIZE],
 
             timer: 0,
@@ -79,8 +99,8 @@ impl Vm {
             sound_timer: 0,
             st_tick: 0.0,
 
-            screen: [0; 64 * 32],
-            keys: [0; 16],
+            screen: [0; SCREEN_PIXELS],
+            keys: [0; NUM_KEYS],
             waiting_on_key: None,
         };
         {
@@ -230,7 +250,7 @@ impl Vm {
                 self.i = addr.bits as usize;
             },
             LongJump(addr) => {
-                self.pc = (self.reg[0] as u16 + addr.bits) as usize;
+                self.pc = (self.reg[Register::V0 as usize] as u16 + addr.bits) as usize;
             },
             Rand(vx, byte) => {
                 self.reg[vx as usize] = rand::thread_rng().gen::<u8>() & byte;
@@ -245,11 +265,11 @@ impl Vm {
 
                 self.reg[Register::VF as usize] = 0;
                 for (sy, byte) in sprite.iter().enumerate() {
-                    let dy = (y + sy) % 32;
+                    let dy = (y + sy) % SCREEN_HEIGHT;
                     for sx in 0usize..8 {
                         let px = (*byte >> (7 - sx)) & 0b00000001;
-                        let dx = (x + sx) % 64;
-                        let idx = dy * 64 + dx;
+                        let dx = (x + sx) % SCREEN_WIDTH;
+                        let idx = dy * SCREEN_WIDTH + dx;
                         self.screen[idx] ^= px;
 
                         // Vf is if there was a collision
@@ -369,12 +389,12 @@ impl Vm {
     }
 
     pub fn screen_rows<'a>(&'a self) -> Chunks<'a, u8> {
-        self.screen.chunks(64)
+        self.screen.chunks(SCREEN_WIDTH)
     }
 
     #[allow(dead_code)]
     pub fn print_screen(&self) {
-        for row in self.screen.chunks(64) {
+        for row in self.screen.chunks(SCREEN_WIDTH) {
             println!("");
             for byte in row.iter() {
                 match *byte {

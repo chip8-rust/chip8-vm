@@ -84,6 +84,7 @@ pub struct Vm {
 }
 
 impl Vm {
+    /// Creates a new `Vm` instance with default state
     pub fn new() -> Vm {
         let mut vm = Vm {
             reg: [0; NUM_DATA_REGISTERS],
@@ -110,6 +111,7 @@ impl Vm {
         vm
     }
 
+    /// Loads the ROM contents from `reader` into RAM at the program start address
     pub fn load_rom(&mut self, reader: &mut Read) -> Result<usize, Chip8Error> {
         let mut rom = Vec::new();
         try!(reader.read_to_end(&mut rom));
@@ -127,10 +129,12 @@ impl Vm {
         writer.write_all(&self.ram).unwrap();
     }
 
+    /// Returns `True` if the sound timer is active
     pub fn beeping(&self) -> bool {
         self.sound_timer > 0
     }
 
+    /// Marks the key with index `idx` as being set
     pub fn set_key(&mut self, idx: u8) {
         self.keys[idx as usize] = 1;
         if let Some(vx) = self.waiting_on_key {
@@ -139,6 +143,7 @@ impl Vm {
         }
     }
 
+    /// Marks they key with index `idx` as being unset
     pub fn unset_key(&mut self, idx: u8) {
         self.keys[idx as usize] = 0;
     }
@@ -367,6 +372,7 @@ impl Vm {
     }
 
     // dt: Time in seconds since last step
+    /// Executes remaining instructions since the last step
     pub fn step(&mut self, dt:f32) {
 
         let sub_steps = (CLOCK_HZ * dt).round() as usize;
@@ -388,10 +394,12 @@ impl Vm {
         }
     }
 
+    /// Returns the pixel rows of the screen
     pub fn screen_rows<'a>(&'a self) -> Chunks<'a, u8> {
         self.screen.chunks(SCREEN_WIDTH)
     }
 
+    /// Prints the current screen pixels to `stdout`
     #[allow(dead_code)]
     pub fn print_screen(&self) {
         for row in self.screen.chunks(SCREEN_WIDTH) {
@@ -405,6 +413,7 @@ impl Vm {
         }
     }
 
+    /// Prints a disassembly of the entire RAM to `stdout`
     #[allow(dead_code)]
     pub fn print_disassembly(&self) {
         for i in self.ram.chunks(2) {

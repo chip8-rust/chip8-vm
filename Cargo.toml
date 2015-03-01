@@ -15,4 +15,5 @@ authors = [
 ]
 
 [dependencies]
-rand = "0.1.2"
+rand = "0.1.3"
+log = "0.2.4"

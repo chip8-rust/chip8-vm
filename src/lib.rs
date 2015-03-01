@@ -26,6 +26,9 @@
 
 extern crate rand;
 
+#[macro_use]
+extern crate log;
+
 pub mod error;
 pub mod instructions;
 pub mod vm;

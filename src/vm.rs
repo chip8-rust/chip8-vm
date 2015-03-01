@@ -107,6 +107,7 @@ impl Vm {
         {
             let mut ram = BufWriter::new(&mut vm.ram[FONT_ADDR..(FONT_ADDR + FONT_BYTES)]);
             ram.write_all(FONT.as_slice()).unwrap();
+            debug!("Initialized VM with built-in font");
         }
         vm
     }
@@ -115,13 +116,16 @@ impl Vm {
     pub fn load_rom(&mut self, reader: &mut Read) -> Result<usize, Chip8Error> {
         let mut rom = Vec::new();
         try!(reader.read_to_end(&mut rom));
-        if rom.len() > (RAM_SIZE - PROGRAM_START) {
-            println!("Rom size {}", rom.len());
+        let rom_len = rom.len();
+        let available_ram = RAM_SIZE - PROGRAM_START;
+        if rom_len > available_ram {
+            error!("ROM size ({}) is larger than available RAM ({})!", rom_len, available_ram);
             return Err(Chip8Error::Io("ROM was larger than available RAM", None))
         }
         let mut ram = BufWriter::new(&mut self.ram[PROGRAM_START..RAM_SIZE]);
         try!(ram.write_all(rom.as_slice()));
-        return Ok(rom.len());
+        debug!("Loaded ROM of size {}", rom_len);
+        return Ok(rom_len);
     }
 
     #[allow(dead_code)]
@@ -136,8 +140,10 @@ impl Vm {
 
     /// Marks the key with index `idx` as being set
     pub fn set_key(&mut self, idx: u8) {
+        debug!("Set key {}", idx);
         self.keys[idx as usize] = 1;
         if let Some(vx) = self.waiting_on_key {
+            debug!("No longer waiting on key");
             self.reg[vx as usize] = idx;
             self.waiting_on_key = None;
         }
@@ -145,6 +151,7 @@ impl Vm {
 
     /// Marks they key with index `idx` as being unset
     pub fn unset_key(&mut self, idx: u8) {
+        debug!("Unset key {}", idx);
         self.keys[idx as usize] = 0;
     }
 
@@ -347,7 +354,7 @@ impl Vm {
                 self.i += vx+1;
             },
             ref other => {
-                println!("Instruction not implemented {:?} skipping...", other)
+                debug!("Instruction not implemented {:?} skipping...", other)
             }
         }
         return false;
@@ -378,9 +385,11 @@ impl Vm {
         let sub_steps = (CLOCK_HZ * dt).round() as usize;
         let ddt = dt / sub_steps as f32;
 
-        for _ in 0..sub_steps {
+        for step in 0..sub_steps {
+            trace!("Executing step {}/{}", step, sub_steps);
             self.time_step(ddt);
             if self.waiting_on_key.is_some() {
+                debug!("Cancel remaining execution steps while waiting for key");
                 return;
             }
 

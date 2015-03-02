@@ -1,0 +1,19 @@
+general:
+  branches:
+    ignore:
+      - gh-pages
+
+machine:
+    environment:
+        XCODE_WORKSPACE: circle.yml
+
+dependencies:
+  override:
+    - curl -s https://static.rust-lang.org/rustup.sh | sudo sh
+  post:
+    - rustc --version
+    - cargo --version
+test:
+  override:
+    - cargo build --verbose
+    - cargo test --verbose

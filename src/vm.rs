@@ -201,7 +201,7 @@ impl Vm {
                 self.reg[vx as usize] = byte;
             },
             AddK(vx, byte) => {
-                self.reg[vx as usize] += byte;
+                self.reg[vx as usize] = self.reg[vx as usize].wrapping_add(byte);
             },
             Set(vx, vy) => self.reg[vx as usize] = self.reg[vy as usize],
             Or(vx, vy)  => self.reg[vx as usize] |= self.reg[vy as usize],
@@ -224,7 +224,7 @@ impl Vm {
                 // VF is Not Borrow i.e. x > y
                 self.reg[Register::VF as usize] = (x > y) as u8;
 
-                self.reg[vx as usize] = x - y;
+                self.reg[vx as usize] = x.wrapping_sub(y);
             },
             ShiftRight(vx, vy) => {
                 let y = self.reg[vy as usize];
@@ -241,7 +241,7 @@ impl Vm {
                 // VF is Not Borrow i.e. y > x
                 self.reg[Register::VF as usize] = (y > x) as u8;
 
-                self.reg[vx as usize] = y - x;
+                self.reg[vx as usize] = y.wrapping_sub(x);
             },
             ShiftLeft(vx, vy) => {
                 let y = self.reg[vy as usize];

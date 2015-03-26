@@ -122,6 +122,7 @@ impl Vm {
             error!("ROM size ({}) is larger than available RAM ({})!", rom_len, available_ram);
             return Err(Chip8Error::Io("ROM was larger than available RAM", None))
         }
+        // TODO: ROM needs to contain at least one instruction to be valid
         let mut ram = BufWriter::new(&mut self.ram[PROGRAM_START..RAM_SIZE]);
         try!(ram.write_all(rom.as_slice()));
         debug!("Loaded ROM of size {}", rom_len);
@@ -270,7 +271,7 @@ impl Vm {
             Draw(vx, vy, n) => {
                 let x = self.reg[vx as usize] as usize;
                 let y = self.reg[vy as usize] as usize;
-                let i = self.i as usize;
+                let i = self.i;
                 let n = n.bits as usize;
 
                 let sprite = &self.ram[i..i+n];
@@ -335,7 +336,7 @@ impl Vm {
             }
             StoreRegisters(vx) => {
                 let vx = vx as usize;
-                let i = self.i as usize;
+                let i = self.i;
 
                 let mut dst = &mut self.ram[i..i+vx+1];
                 for (x,b) in dst.iter_mut().enumerate() {
@@ -345,7 +346,7 @@ impl Vm {
             },
             LoadRegisters(vx) => {
                 let vx = vx as usize;
-                let i = self.i as usize;
+                let i = self.i;
 
                 let src = &self.ram[i..i+vx+1];
                 for (x,b) in src.iter().enumerate() {

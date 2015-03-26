@@ -5,6 +5,7 @@ use std::io;
 use std::error::{Error, FromError};
 
 /// `Error` variants for public errors in this crate
+#[derive(Debug)]
 pub enum Chip8Error {
     /// I/O error
     Io(&'static str, Option<io::Error>),

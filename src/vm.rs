@@ -106,7 +106,7 @@ impl Vm {
         };
         {
             let mut ram = BufWriter::new(&mut vm.ram[FONT_ADDR..(FONT_ADDR + FONT_BYTES)]);
-            ram.write_all(FONT.as_slice()).unwrap();
+            ram.write_all(FONT.as_ref()).unwrap();
             debug!("Initialized VM with built-in font");
         }
         vm
@@ -124,7 +124,7 @@ impl Vm {
         }
         // TODO: ROM needs to contain at least one instruction to be valid
         let mut ram = BufWriter::new(&mut self.ram[PROGRAM_START..RAM_SIZE]);
-        try!(ram.write_all(rom.as_slice()));
+        try!(ram.write_all(rom.as_ref()));
         debug!("Loaded ROM of size {}", rom_len);
         return Ok(rom_len);
     }

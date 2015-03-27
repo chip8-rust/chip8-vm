@@ -21,6 +21,8 @@
 // for `error:Error` and such
 #![feature(core)]
 
+#![feature(convert)]
+
 extern crate rand;
 
 #[macro_use]

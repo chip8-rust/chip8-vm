@@ -21,7 +21,7 @@
 // for `error:Error` and such
 #![feature(core)]
 
-#![feature(convert)]
+#![feature(slice_patterns)]
 
 extern crate rand;
 

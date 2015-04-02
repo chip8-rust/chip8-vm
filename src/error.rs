@@ -2,7 +2,8 @@
 
 use std::fmt;
 use std::io;
-use std::error::{Error, FromError};
+use std::error::Error;
+use std::convert::From;
 
 /// `Error` variants for public errors in this crate
 #[derive(Debug)]
@@ -32,8 +33,8 @@ impl Error for Chip8Error {
     }
 }
 
-impl FromError<io::Error> for Chip8Error {
-    fn from_error(err: io::Error) -> Chip8Error {
-        Chip8Error::Io("Internal IO error: ", Some(err))
+impl From<io::Error> for Chip8Error {
+    fn from(err: io::Error) -> Chip8Error {
+        Chip8Error::Io("I/O error", Some(err))
     }
 }

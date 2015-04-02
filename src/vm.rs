@@ -10,8 +10,6 @@ use std::slice::Chunks;
 
 use rand::Rng;
 
-use std::num::Float;
-
 /// Size of the RAM in bytes
 const RAM_SIZE: usize = 4096;
 /// Depth of the stack

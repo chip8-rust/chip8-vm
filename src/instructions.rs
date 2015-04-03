@@ -5,7 +5,7 @@ use std::num::{FromPrimitive, ToPrimitive};
 /// A register index/name
 ///
 /// There are 16 data registers, `V0`..`VF`
-#[derive(FromPrimitive, Copy, Debug)]
+#[derive(FromPrimitive, Clone, Copy, Debug)]
 pub enum Register {
     V0 = 0x0,
     V1 = 0x1,
@@ -48,7 +48,7 @@ pub type Byte = u8;
 /// A nibble (hex digit)
 ///
 /// Valid values are within `0x0` .. `0xF`.
-#[derive(Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Nibble {
     pub bits: u8,
 }
@@ -63,7 +63,7 @@ impl Nibble {
 /// Absolute memory address
 ///
 /// Valid addresses are within `0x0` .. `0xFFF`.
-#[derive(Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Addr {
     pub bits: u16,
 }
@@ -79,7 +79,7 @@ impl Addr {
 /// Raw instruction
 ///
 /// Helper around the raw bits, not necessarily a valid instruction.
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct RawInstruction {
     bits: u16
 }
@@ -130,7 +130,7 @@ impl RawInstruction {
 /// High-level instruction
 ///
 /// A valid instruction that can be executed as-is.
-#[derive(Copy,Debug)]
+#[derive(Clone, Copy,Debug)]
 pub enum Instruction {
     /// Jumps to machine subroutine at `Addr`.
     ///

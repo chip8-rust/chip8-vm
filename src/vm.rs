@@ -61,7 +61,9 @@ const NUM_KEYS: usize = 16;
 /// The virtual machine manages state like its registers,
 /// the RAM, stack, screen pixels, pressed keys as well as
 /// timers and some internal state.
-#[derive(Copy)]
+// This would require "impl<T> Clone for [T; ARBITRARY_CONSTANT] where T: Copy"
+// One can probably do this with a macro, but for now I'm too lazy.
+//#[derive(Clone, Copy)]
 pub struct Vm {
     reg: [u8; NUM_DATA_REGISTERS],
     i: usize,

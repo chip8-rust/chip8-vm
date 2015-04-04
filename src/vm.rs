@@ -423,6 +423,8 @@ impl Vm {
         }
     }
 
+    // This needs experimental slice patterns and is unused anyways
+    /*
     /// Prints a disassembly of the entire RAM to `stdout`
     #[allow(dead_code)]
     pub fn print_disassembly(&self) {
@@ -444,6 +446,7 @@ impl Vm {
             }
         }
     }
+    */
 }
 
 #[cfg(test)]

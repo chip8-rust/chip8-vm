@@ -17,11 +17,6 @@
 //! `std:error::Error` for any kinds of errors that might occur using
 //! the `chip8_vm` crate.
 
-// Silence 'core' feature warnings
-// for `error:Error` and such
-#![feature(core)]
-
-#![feature(slice_patterns)]
 
 extern crate rand;
 

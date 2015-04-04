@@ -1,11 +1,10 @@
 //! Raw and high-level instruction abstractions
 
-use std::num::{FromPrimitive, ToPrimitive};
 
 /// A register index/name
 ///
 /// There are 16 data registers, `V0`..`VF`
-#[derive(FromPrimitive, Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum Register {
     V0 = 0x0,
     V1 = 0x1,
@@ -25,13 +24,31 @@ pub enum Register {
     VF = 0xF,
 }
 
-impl ToPrimitive for Register {
-    fn to_i64(&self) -> Option<i64> {
-        Some(*self as i64)
-    }
+impl Register {
+    pub fn new(bits: u8) -> Result<Register, ()> {
+        use self::Register::*;
 
-    fn to_u64(&self) -> Option<u64> {
-        Some(*self as u64)
+        match bits {
+            0x0 => Ok(V0),
+            0x1 => Ok(V1),
+            0x2 => Ok(V2),
+            0x3 => Ok(V3),
+            0x4 => Ok(V4),
+            0x5 => Ok(V5),
+            0x6 => Ok(V6),
+            0x7 => Ok(V7),
+            0x8 => Ok(V8),
+            0x9 => Ok(V9),
+            0xA => Ok(VA),
+            0xB => Ok(VB),
+            0xC => Ok(VC),
+            0xD => Ok(VD),
+            0xE => Ok(VE),
+            0xF => Ok(VF),
+
+            // TODO: Return a proper Error
+            _ => Err(())
+        }
     }
 }
 
@@ -103,12 +120,12 @@ impl RawInstruction {
 
     /// The *`Vx` register-index* part, i.e. `0xE` is `VE`
     pub fn x(&self) -> Vx {
-        FromPrimitive::from_u8(((self.bits & 0x0F00) >> 8) as u8).unwrap()
+        Register::new(((self.bits & 0x0F00) >> 8) as u8).unwrap()
     }
 
     /// The *`Vy` register-index* part, i.e. `0xE` is `VE`
     pub fn y(&self) -> Vy {
-        FromPrimitive::from_u8(((self.bits & 0x00F0) >> 4) as u8).unwrap()
+        Register::new(((self.bits & 0x00F0) >> 4) as u8).unwrap()
     }
 
     /// The *high nibble* part
@@ -295,5 +312,20 @@ impl Instruction {
             }
             _ => Unknown
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn unknown_register() {
+        assert!(Register::new(0x42).is_err())
+    }
+
+    #[test]
+    fn known_register() {
+        assert_eq!(Register::new(0xF).unwrap() as u8, Register::VF as u8)
     }
 }

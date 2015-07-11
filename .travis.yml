@@ -4,8 +4,9 @@ env:
     - secure: eh16T+EPdEtelIDMBCj5hiZucybVNRQaZP475KhKRC75UnH4i0163LTcOyaUa4mhVFk8hTGMkBKrLMtW1Bz9AGuOrpUehgRohe1nj93nl1aZZZzuOzV4vwoewkUz2MWjZ+tGXp3oRG0qRNETWxvkZHsJvXf83qylj4+ywAX15d0=
 language: rust
 rust:
+  - stable
+  - beta
   - nightly
-  - 1.0.0-beta
 sudo: false
 script:
   - cargo build --verbose

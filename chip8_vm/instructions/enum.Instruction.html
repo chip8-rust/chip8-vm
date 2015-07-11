@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Instruction` enum in crate `chip8_vm`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Instruction">
+
+    <title>chip8_vm::instructions::Instruction - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <section class="sidebar">
+        
+        <p class='location'><a href='../index.html'>chip8_vm</a>::<wbr><a href='index.html'>instructions</a></p><script>window.sidebarCurrent = {name: 'Instruction', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press 'S' to search, '?' for more options..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>chip8_vm</a>::<wbr><a href='index.html'>instructions</a>::<wbr><a class='enum' href=''>Instruction</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-835' class='srclink' href='../../src/chip8_vm/instructions.rs.html#151-250' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum Instruction {
+    Sys(<a class='struct' href='../../chip8_vm/instructions/struct.Addr.html' title='chip8_vm::instructions::Addr'>Addr</a>),
+    Clear,
+    Return,
+    Jump(<a class='struct' href='../../chip8_vm/instructions/struct.Addr.html' title='chip8_vm::instructions::Addr'>Addr</a>),
+    Call(<a class='struct' href='../../chip8_vm/instructions/struct.Addr.html' title='chip8_vm::instructions::Addr'>Addr</a>),
+    SkipEqualK(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Byte.html' title='chip8_vm::instructions::Byte'>Byte</a>),
+    SkipNotEqualK(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Byte.html' title='chip8_vm::instructions::Byte'>Byte</a>),
+    SkipEqual(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    SetK(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Byte.html' title='chip8_vm::instructions::Byte'>Byte</a>),
+    AddK(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Byte.html' title='chip8_vm::instructions::Byte'>Byte</a>),
+    Set(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    Or(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    And(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    XOr(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    Add(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    Sub(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    ShiftRight(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    SubInv(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    ShiftLeft(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    SkipNotEqual(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>),
+    LoadI(<a class='struct' href='../../chip8_vm/instructions/struct.Addr.html' title='chip8_vm::instructions::Addr'>Addr</a>),
+    LongJump(<a class='struct' href='../../chip8_vm/instructions/struct.Addr.html' title='chip8_vm::instructions::Addr'>Addr</a>),
+    Rand(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Byte.html' title='chip8_vm::instructions::Byte'>Byte</a>),
+    Draw(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>, <a class='type' href='../../chip8_vm/instructions/type.Vy.html' title='chip8_vm::instructions::Vy'>Vy</a>, <a class='struct' href='../../chip8_vm/instructions/struct.Nibble.html' title='chip8_vm::instructions::Nibble'>Nibble</a>),
+    SkipPressed(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    SkipNotPressed(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    GetTimer(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    WaitKey(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    SetTimer(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    SetSoundTimer(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    AddToI(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    LoadHexGlyph(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    StoreBCD(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    StoreRegisters(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    LoadRegisters(<a class='type' href='../../chip8_vm/instructions/type.Vx.html' title='chip8_vm::instructions::Vx'>Vx</a>),
+    Unknown,
+}</pre><div class='docblock'><p>High-level instruction</p>
+
+<p>A valid instruction that can be executed as-is.</p>
+</div><h2 class='variants'>Variants</h2>
+<table><tr><td id='variant.Sys'><code>Sys</code></td><td><div class='docblock'><p>Jumps to machine subroutine at <code>Addr</code>.</p>
+
+<p>Note that this is intentionally not implemented in the <code>Vm</code>.</p>
+</div></td></tr><tr><td id='variant.Clear'><code>Clear</code></td><td><div class='docblock'><p>Clears the screen.</p>
+
+<p>Sets all pixels to the unlit state.</p>
+</div></td></tr><tr><td id='variant.Return'><code>Return</code></td><td><div class='docblock'><p>Returns from a subroutine</p>
+</div></td></tr><tr><td id='variant.Jump'><code>Jump</code></td><td><div class='docblock'><p>Jumps to <code>Addr</code></p>
+</div></td></tr><tr><td id='variant.Call'><code>Call</code></td><td><div class='docblock'><p>Calls subroutine at <code>Addr</code></p>
+</div></td></tr><tr><td id='variant.SkipEqualK'><code>SkipEqualK</code></td><td><div class='docblock'><p>Skips the next instructions if <code>Vx</code> equals <code>Byte</code></p>
+</div></td></tr><tr><td id='variant.SkipNotEqualK'><code>SkipNotEqualK</code></td><td><div class='docblock'><p>Skips the next instruction if <code>Vx</code> does not equal <code>Byte</code></p>
+</div></td></tr><tr><td id='variant.SkipEqual'><code>SkipEqual</code></td><td><div class='docblock'><p>Skips the next instruction if <code>Vx</code> and <code>Vy</code> are equal</p>
+</div></td></tr><tr><td id='variant.SetK'><code>SetK</code></td><td><div class='docblock'><p>Sets <code>Vy</code> to <code>Byte</code></p>
+</div></td></tr><tr><td id='variant.AddK'><code>AddK</code></td><td><div class='docblock'><p>Adds <code>Byte</code> to <code>Vx</code>, then stores the result in <code>Vx</code></p>
+</div></td></tr><tr><td id='variant.Set'><code>Set</code></td><td><div class='docblock'><p>Stores <code>Vy</code> in <code>Vx</code></p>
+</div></td></tr><tr><td id='variant.Or'><code>Or</code></td><td><div class='docblock'><p>Performs a bitwise OR (<code>|</code>) of <code>Vx</code> and <code>Vy</code>, then stores the result in <code>Vx</code></p>
+</div></td></tr><tr><td id='variant.And'><code>And</code></td><td><div class='docblock'><p>Performs a bitwise AND (<code>&amp;</code>) of <code>Vx</code> and <code>Vy</code>, then stores the result in <code>Vx</code></p>
+</div></td></tr><tr><td id='variant.XOr'><code>XOr</code></td><td><div class='docblock'><p>Performs a bitwise XOR (<code>^</code>) of <code>Vx</code> and <code>Vy</code>, then stores the result in <code>Vx</code></p>
+</div></td></tr><tr><td id='variant.Add'><code>Add</code></td><td><div class='docblock'><p>Adds <code>Vx</code> and <code>Vy</code>, then stores the result in in <code>Vx</code>.</p>
+
+<p><code>VF</code> is set to <code>1</code> on overflow, <code>0</code> otherwise.</p>
+</div></td></tr><tr><td id='variant.Sub'><code>Sub</code></td><td><div class='docblock'><p>Subtracts <code>Vy</code> from <code>Vx</code>, then stores the result in <code>Vx</code>.</p>
+
+<p><code>VF</code> is set to <code>1</code> if <code>Vx</code> is larger than <code>Vy</code> prior subtraction, <code>0</code> otherwise.</p>
+</div></td></tr><tr><td id='variant.ShiftRight'><code>ShiftRight</code></td><td><div class='docblock'><p>Shifts <code>Vy</code> right by one bit, then stores the result in <code>Vx</code>.</p>
+
+<p>Stores the least-significant bit prior shift of <code>Vy</code> in <code>VF</code>.</p>
+</div></td></tr><tr><td id='variant.SubInv'><code>SubInv</code></td><td><div class='docblock'><p>Subtracts <code>Vx</code> from <code>Vy</code>, then stores the result in <code>Vx</code>.</p>
+
+<p><code>VF</code> is set to <code>1</code> if <code>Vx</code> is larger than <code>Vy</code> prior subtraction, <code>0</code> otherwise.</p>
+
+<p>Note that this is the same as <code>Sub</code> with inverted register operands.</p>
+</div></td></tr><tr><td id='variant.ShiftLeft'><code>ShiftLeft</code></td><td><div class='docblock'><p>Shifts <code>Vy</code> left by one bit, then stores the result in <code>Vx</code>.</p>
+
+<p>Stores the most-significant bit prior shift of <code>Vy</code> in <code>VF</code>.</p>
+</div></td></tr><tr><td id='variant.SkipNotEqual'><code>SkipNotEqual</code></td><td><div class='docblock'><p>Skips the next instruction if <code>Vx</code> and <code>Vy</code> are not equal</p>
+</div></td></tr><tr><td id='variant.LoadI'><code>LoadI</code></td><td><div class='docblock'><p>Sets the <code>I</code> register to <code>Addr</code></p>
+</div></td></tr><tr><td id='variant.LongJump'><code>LongJump</code></td><td><div class='docblock'><p>Jumps to <code>V0 + Addr</code></p>
+</div></td></tr><tr><td id='variant.Rand'><code>Rand</code></td><td><div class='docblock'><p>Sets <code>Vx</code> to a random byte ANDed with <code>Byte</code></p>
+</div></td></tr><tr><td id='variant.Draw'><code>Draw</code></td><td><div class='docblock'><p>Draws the sprite with <code>Nibble</code> bytes of data from the <code>I</code> register at position <code>(Vx, Vy)</code>.</p>
+
+<p>Sets <code>VF</code> to <code>1</code> if any pixels are set to unlit state, <code>0</code> otherwise.</p>
+
+<p>Note that sprites wrap around onto the opposite side of the screen.</p>
+</div></td></tr><tr><td id='variant.SkipPressed'><code>SkipPressed</code></td><td><div class='docblock'><p>Skips the next instruction if key <code>Vx</code> is pressed</p>
+</div></td></tr><tr><td id='variant.SkipNotPressed'><code>SkipNotPressed</code></td><td><div class='docblock'><p>Skips the next instruction if key <code>Vx</code> is not pressed</p>
+</div></td></tr><tr><td id='variant.GetTimer'><code>GetTimer</code></td><td><div class='docblock'><p>Stores the value of the <code>delay timer</code> in <code>Vx</code></p>
+</div></td></tr><tr><td id='variant.WaitKey'><code>WaitKey</code></td><td><div class='docblock'><p>Stops execution until a key is pressed, then stores that key in <code>Vx</code></p>
+</div></td></tr><tr><td id='variant.SetTimer'><code>SetTimer</code></td><td><div class='docblock'><p>Sets the <code>delay timer</code> to <code>Vx</code></p>
+</div></td></tr><tr><td id='variant.SetSoundTimer'><code>SetSoundTimer</code></td><td><div class='docblock'><p>Sets the <code>sound timer</code> to <code>Vx</code></p>
+</div></td></tr><tr><td id='variant.AddToI'><code>AddToI</code></td><td><div class='docblock'><p>Adds <code>Vx</code> and the <code>I</code> register, then stores the result in <code>I</code></p>
+</div></td></tr><tr><td id='variant.LoadHexGlyph'><code>LoadHexGlyph</code></td><td><div class='docblock'><p>Stores the address of the hexadecimal digit <code>Vx</code> in the <code>I</code> register</p>
+</div></td></tr><tr><td id='variant.StoreBCD'><code>StoreBCD</code></td><td><div class='docblock'><p>Stores the binary-coded decimal representation of <code>Vx</code> at address <code>I</code>, <code>I + 1</code> and <code>I + 2</code></p>
+</div></td></tr><tr><td id='variant.StoreRegisters'><code>StoreRegisters</code></td><td><div class='docblock'><p>Stores the registers <code>V0</code> to <code>Vx</code> inclusive at address <code>I</code>.</p>
+
+<p>Register <code>I</code> is set to <code>I + Vx + 1</code> afterwards.</p>
+</div></td></tr><tr><td id='variant.LoadRegisters'><code>LoadRegisters</code></td><td><div class='docblock'><p>Reads the registers <code>V0</code> to <code>Vx</code> inclusive from address <code>I</code>.</p>
+
+<p>Register <code>I</code> is set to <code>I + Vx + 1</code> afterwards.</p>
+</div></td></tr><tr><td id='variant.Unknown'><code>Unknown</code></td><td><div class='docblock'><p>Placeholder for an unknown or illegal instruction.</p>
+
+<p>Note that this is not a real CHIP-8 instruction.</p>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='enum' href='../../chip8_vm/instructions/enum.Instruction.html' title='chip8_vm::instructions::Instruction'>Instruction</a></code></h3><div class='impl-items'><h4 id='method.from_raw' class='method'><code>fn <a href='#method.from_raw' class='fnname'>from_raw</a>(raw: &amp;<a class='struct' href='../../chip8_vm/instructions/struct.RawInstruction.html' title='chip8_vm::instructions::RawInstruction'>RawInstruction</a>) -&gt; <a class='enum' href='../../chip8_vm/instructions/enum.Instruction.html' title='chip8_vm::instructions::Instruction'>Instruction</a></code></h4>
+<div class='docblock'><p>Creates a new instruction from raw bits,
+or <code>Instruction::Unknown</code> if no valid match could be found</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../chip8_vm/instructions/enum.Instruction.html' title='chip8_vm::instructions::Instruction'>Instruction</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='http://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='enum' href='../../chip8_vm/instructions/enum.Instruction.html' title='chip8_vm::instructions::Instruction'>Instruction</a></code></h3><div class='impl-items'></div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='enum' href='../../chip8_vm/instructions/enum.Instruction.html' title='chip8_vm::instructions::Instruction'>Instruction</a></code></h3><div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='enum' href='../../chip8_vm/instructions/enum.Instruction.html' title='chip8_vm::instructions::Instruction'>Instruction</a></code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&larrb;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&rarrb;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code>, <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+            <p>
+                Search functions by type signature (e.g.
+                <code>vec -> usize</code>)
+            </p>
+        </div>
+    </div>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "chip8_vm";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>

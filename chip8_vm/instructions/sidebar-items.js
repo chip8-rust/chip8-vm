@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Instruction","High-level instruction"],["Register","A register index/name"]],"struct":[["Addr","Absolute memory address"],["Nibble","A nibble (hex digit)"],["RawInstruction","Raw instruction"]],"type":[["Byte","A byte"],["Vx","First register in an opcode"],["Vy","Second register in an opcode"]]});

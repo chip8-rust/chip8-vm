@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["version","Returns the version of this crate in the format `MAJOR.MINOR.PATCH`."]],"mod":[["error","`std:error:Error` implementations"],["instructions","Raw and high-level instruction abstractions"],["vm","Virtual machine implementation"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Chip8Error","`Error` variants for public errors in this crate"]]});
